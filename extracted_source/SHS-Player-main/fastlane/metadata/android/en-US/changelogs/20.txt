@@ -1,2 +1,0 @@
-- Updated media3 to library to 1.4.1
-- Updated translations
