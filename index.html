@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHS Player v0.15.7 - The Ultimate Multimedia Engine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Dela+Gothic+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* --- Core & Variables --- */
+        :root {
+            --g-blue: #4285F4;
+            --g-red: #EA4335;
+            --g-yellow: #FBBC05;
+            --g-green: #34A853;
+            --marble-bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --marble-card: linear-gradient(160deg, #ffffff 0%, #f0f2f5 40%, #e4e8ec 100%);
+            --text-main: #1a1a1a;
+            --text-sub: #4a4a4a;
+            --perspective: 1200px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #f8f9fa; /* Flat background */
+            color: var(--text-main);
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            perspective: var(--perspective);
+        }
+
+        /* --- Typography (Dhruv Rathee / High Impact Style) --- */
+        h1, h2, h3, .impact-text {
+            font-family: 'Dela Gothic One', cursive;
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+
+        .highlight-blue { color: var(--g-blue); }
+        .highlight-red { color: var(--g-red); }
+        .highlight-yellow { color: var(--g-yellow); text-shadow: 1px 1px 0px rgba(0,0,0,0.1); }
+        .highlight-green { color: var(--g-green); }
+
+        /* --- 3D & Marble Aesthetics --- */
+        .3d-container {
+            transform-style: preserve-3d;
+            perspective: var(--perspective);
+        }
+
+        .marble-panel {
+            background: var(--marble-card);
+            border: 1px solid rgba(255,255,255,0.8);
+            border-left: 6px solid var(--g-blue);
+            border-radius: 20px;
+            box-shadow: none !important; /* NO SHADOWS */
+            transform: translateZ(0px) rotateX(1deg) rotateY(-1deg);
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.3s;
+            will-change: transform;
+        }
+
+        .marble-panel:hover {
+            transform: translateZ(40px) rotateX(0deg) rotateY(0deg) scale(1.01);
+            border-left-color: var(--g-red);
+        }
+
+        .marble-panel-red { border-left-color: var(--g-red); }
+        .marble-panel-red:hover { border-left-color: var(--g-yellow); }
+        
+        .marble-panel-yellow { border-left-color: var(--g-yellow); }
+        .marble-panel-yellow:hover { border-left-color: var(--g-green); }
+
+        .marble-panel-green { border-left-color: var(--g-green); }
+        .marble-panel-green:hover { border-left-color: var(--g-blue); }
+
+        /* --- Apple-style Sections --- */
+        .section-apple {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px 5%;
+            position: relative;
+            overflow: hidden; /* Keep content inside bounds */
+        }
+
+        .section-title {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* --- Animations & Scroll Reveal --- */
+        .reveal-element {
+            opacity: 0;
+            transform: translateY(60px) translateZ(-100px) rotateX(10deg);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-element.active {
+            opacity: 1;
+            transform: translateY(0) translateZ(0) rotateX(0);
+        }
+
+        /* Anime Sparkle Effect */
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1) rotate(180deg); }
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--g-yellow);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            animation: sparkle 2s infinite ease-in-out;
+            z-index: 1;
+        }
+
+        /* --- Specific Components --- */
+        
+        /* Navbar */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 2px solid #fff;
+            box-shadow: none !important;
+        }
+
+        .nav-logo {
+            font-family: 'Dela Gothic One', cursive;
+            font-size: 1.5rem;
+            color: var(--g-blue);
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 600;
+            margin-left: 30px;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 3px;
+            bottom: -5px;
+            left: 0;
+            background: var(--g-red);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding-top: 120px;
+            text-align: center;
+        }
+
+        .hero-logo {
+            width: 140px;
+            border-radius: 30px;
+            border: 4px solid #fff;
+            transform: translateZ(50px);
+            transition: transform 0.5s;
+            max-width: 100%;
+        }
+
+        .hero-logo:hover {
+            transform: translateZ(80px) rotate(5deg);
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            margin: 20px 0;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            font-weight: 600;
+            color: var(--text-sub);
+            max-width: 800px;
+            margin: 0 auto 40px;
+        }
+
+        /* Badges */
+        .badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .badge {
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: white;
+            transform: translateZ(20px);
+            transition: transform 0.3s;
+            white-space: nowrap;
+        }
+
+        .badge:hover { transform: translateZ(40px) scale(1.05); }
+        .bg-blue { background: var(--g-blue); }
+        .bg-red { background: var(--g-red); }
+        .bg-yellow { background: var(--g-yellow); color: #333; }
+        .bg-green { background: var(--g-green); }
+        .bg-purple { background: #7F52FF; }
+
+        /* CTA Button */
+        .cta-btn {
+            display: inline-block;
+            padding: 20px 40px;
+            font-family: 'Dela Gothic One', cursive;
+            font-size: 1.5rem;
+            color: white;
+            background: var(--g-green);
+            text-decoration: none;
+            border-radius: 60px;
+            border-bottom: 6px solid #2c7a3e;
+            transition: all 0.2s;
+            transform: translateZ(0);
+        }
+
+        .cta-btn:hover {
+            transform: translateZ(30px) translateY(-4px);
+            border-bottom-width: 10px;
+        }
+
+        /* Grid Layouts */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .feature-card {
+            padding: 40px;
+            background: var(--marble-card);
+            border-radius: 30px;
+            border-top: 6px solid var(--g-blue);
+            box-shadow: none !important;
+            transform-style: preserve-3d;
+            transform: perspective(1000px) translateZ(0px);
+            transition: transform 0.4s;
+        }
+
+        .feature-card:hover {
+            transform: perspective(1000px) translateZ(30px) rotateY(2deg);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        /* Tables (Apple Minimalist Style) */
+        .table-container {
+            overflow-x: auto;
+            background: #fff;
+            border-radius: 20px;
+            border: 1px solid #eee;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-weight: 600;
+            min-width: 600px; /* Prevents breaking layout */
+        }
+
+        th, td {
+            padding: 20px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        th {
+            font-family: 'Dela Gothic One', cursive;
+            color: var(--g-blue);
+            font-size: 1.1rem;
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Screenshots Gallery (Changed to Grid for Fit-to-Screen) */
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .screenshot-card {
+            background: #fff;
+            padding: 10px;
+            border-radius: 20px;
+            border: 4px solid #fff;
+            transform: perspective(800px) rotateY(2deg) translateZ(0);
+            transition: transform 0.4s, border-color 0.3s;
+            overflow: hidden;
+        }
+
+        .screenshot-card:hover {
+            transform: perspective(800px) rotateY(0deg) translateZ(40px) scale(1.02);
+            border-color: var(--g-blue);
+        }
+
+        .screenshot-card img {
+            width: 100%;
+            border-radius: 15px;
+            display: block;
+        }
+
+        /* Deep Dive / Accordion */
+        details {
+            background: #fff;
+            border-left: 6px solid var(--g-yellow);
+            margin-bottom: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        
+        details:hover {
+            transform: translateZ(10px);
+        }
+
+        summary {
+            padding: 20px;
+            font-family: 'Dela Gothic One', cursive;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        summary::-webkit-details-marker { display: none; }
+        
+        summary::after {
+            content: '▸';
+            font-size: 1.5rem;
+            color: var(--g-red);
+            transition: transform 0.3s;
+        }
+
+        details[open] summary::after {
+            transform: rotate(90deg);
+        }
+
+        .details-content {
+            padding: 0 20px 20px;
+            line-height: 1.8;
+        }
+
+        .code-block {
+            background: #2d3436;
+            color: #dfe6e9;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            overflow-x: auto;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+
+        /* Community & Footer */
+        .community-grid {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .community-btn {
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 800;
+            text-decoration: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.3s;
+        }
+
+        .community-btn:hover {
+            transform: translateZ(20px) scale(1.05);
+        }
+
+        /* Donation Copy Section */
+        .donation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            text-align: left;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        .donation-item {
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+
+        .donation-item:hover {
+            transform: translateZ(10px);
+        }
+
+        .crypto-address {
+            font-size: 0.8rem;
+            word-break: break-all;
+            display: block;
+            margin-top: 5px;
+            color: var(--text-sub);
+        }
+
+        .copy-btn {
+            background: var(--g-blue);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-left: 10px;
+            transition: background 0.2s, transform 0.1s;
+            flex-shrink: 0;
+        }
+
+        .copy-btn:hover {
+            background: var(--g-red);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        footer {
+            text-align: center;
+            padding: 60px 20px;
+            font-weight: 600;
+            color: var(--text-sub);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .section-apple { padding: 60px 4%; }
+            .features-grid { grid-template-columns: 1fr; }
+            .marble-panel:hover { transform: translateZ(10px); }
+            .feature-card:hover { transform: perspective(1000px) translateZ(10px); }
+            .screenshot-card { transform: none; }
+            .screenshot-card:hover { transform: translateZ(10px) scale(1.01); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="3d-container">
+        <div class="nav-logo">SHS Player</div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#experience">Experience</a>
+            <a href="#tech">Tech</a>
+            <a href="#community">Community</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="section-apple hero 3d-container">
+        <div class="sparkle" style="top: 20%; left: 20%; animation-delay: 0s;"></div>
+        <div class="sparkle" style="top: 30%; right: 25%; animation-delay: 0.5s;"></div>
+        <div class="sparkle" style="bottom: 30%; left: 15%; animation-delay: 1s;"></div>
+
+        <div class="reveal-element">
+            <img src="https://i.postimeg.cc/7d5ede9bbeff4fecbfcbbaf8534dc6f1.jpg" alt="SHS Player Logo" class="hero-logo">
+        </div>
+        
+        <h1 class="hero-title reveal-element">
+            🎬 SHS Player <span class="highlight-blue">v0.15.7</span>
+        </h1>
+
+        <p class="hero-subtitle reveal-element">
+            <span class="highlight-red">Not just</span> a video player. A complete cinematic powerhouse with pro editing tools, built-in music engine, privacy vault, 1-click online subtitles, and Wi-Fi file sharing — all <span class="highlight-green">ad-free, forever.</span>
+        </p>
+
+        <div class="badge-container reveal-element">
+            <span class="badge bg-blue"><i class="fa-brands fa-android"></i> v0.15.7</span>
+            <span class="badge bg-green"><i class="fa-solid fa-scale-balanced"></i> MIT License</span>
+            <span class="badge bg-yellow"><i class="fa-solid fa-mobile-screen"></i> Min SDK 23</span>
+            <span class="badge bg-purple"><i class="fa-solid fa-code"></i> Kotlin 2.3.0</span>
+        </div>
+
+        <p class="reveal-element" style="margin-bottom: 30px; font-weight: 600;">
+            Created by <span class="highlight-red">Sajjad Hussain Shobuj (SHS)</span> — Built from Bangladesh 🇧🇩
+        </p>
+
+        <div class="reveal-element">
+            <a href="https://github.com/hamsazzad/SHS-Player/releases/tag/v0.15.7" class="cta-btn">
+                📥 DOWNLOAD LATEST APK
+            </a>
+        </div>
+
+        <div style="margin-top: 30px;" class="reveal-element">
+            <a href="https://github.com/The-JDdev/SHS-Player/issues" style="color: var(--text-sub); margin: 0 15px; text-decoration: none; font-weight: 800;">🐛 Report a Bug</a>
+            <a href="https://t.me/aamoviesofficial" style="color: var(--g-blue); margin: 0 15px; text-decoration: none; font-weight: 800;">💬 Telegram</a>
+            <a href="https://fb.com/itsshsshobuj" style="color: var(--g-red); margin: 0 15px; text-decoration: none; font-weight: 800;">📘 Facebook</a>
+        </div>
+    </section>
+
+    <!-- What's New Section -->
+    <section class="section-apple 3d-container" id="features">
+        <h2 class="section-title reveal-element">
+            🚀 What's New in <span class="highlight-red">v0.15.7</span>
+            <br><span style="font-size: 0.6em; color: var(--text-sub);">The "Ultimate Control" Update</span>
+        </h2>
+
+        <div class="features-grid">
+            <div class="marble-panel reveal-element" style="padding: 30px;">
+                <div class="feature-icon highlight-blue">🌐</div>
+                <h3>1-Click Online Subtitles</h3>
+                <p style="margin-top: 10px; color: var(--text-sub);">Deep OpenSubtitles API integration. Search, download, and instantly inject subtitles into ExoPlayer without ever leaving or reloading the video.</p>
+            </div>
+            <div class="marble-panel marble-panel-red reveal-element" style="padding: 30px;">
+                <div class="feature-icon highlight-red">🎧</div>
+                <h3>Audio Sync & Equalizers</h3>
+                <p style="margin-top: 10px; color: var(--text-sub);">Fix out-of-sync audio instantly with millisecond Audio Delay/Forward offset. Native Android Equalizer API for deep frequency tuning.</p>
+            </div>
+            <div class="marble-panel marble-panel-yellow reveal-element" style="padding: 30px;">
+                <div class="feature-icon highlight-yellow">🎵</div>
+                <h3>Dedicated Audio UI</h3>
+                <p style="margin-top: 10px; color: var(--text-sub);">Beautifully dedicated Audio UI with spinning album art, previous/next controls, and an interactive playlist queue. No black video surfaces.</p>
+            </div>
+            <div class="marble-panel marble-panel-green reveal-element" style="padding: 30px;">
+                <div class="feature-icon highlight-green">📡</div>
+                <h3>Rewritten Wi-Fi Transfer</h3>
+                <p style="margin-top: 10px; color: var(--text-sub);">Rebuilt from scratch! ZXing QR generation, CameraX + MLKit scanning, NanoHTTPD for rock-solid local cross-platform transfers.</p>
+            </div>
+            <div class="marble-panel reveal-element" style="padding: 30px;">
+                <div class="feature-icon highlight-blue">🎛️</div>
+                <h3>Customizable Player UI</h3>
+                <p style="margin-top: 10px; color: var(--text-sub);">Your player, your rules. Edit, remove, and rearrange buttons directly on the player menu.</p>
+            </div>
+            <div class="marble-panel marble-panel-red reveal-element" style="padding: 30px;">
+                <div class="feature-icon highlight-red">📜 & 🔒</div>
+                <h3>Fast Scroll & Vault Fix</h3>
+                <p style="margin-top: 10px; color: var(--text-sub);">Side-drag fast scroller on all RecyclerViews. Vault media securely plays internally via FileProvider. Theme engine logic rewritten.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Previous Updates & Comparison -->
+    <section class="section-apple 3d-container" style="background: #fff;">
+        <h2 class="section-title reveal-element">
+            🔥 Why <span class="highlight-blue">SHS Player</span>?
+        </h2>
+
+        <div class="marble-panel reveal-element" style="max-width: 800px; margin: 0 auto 60px; padding: 30px;">
+            <h3 style="color: var(--g-green); margin-bottom: 15px;">🌟 Previous Update Highlights (v0.15.4 God Level)</h3>
+            <ul style="list-style: none; line-height: 2; color: var(--text-sub);">
+                <li><i class="fa-solid fa-volume-high" style="color: var(--g-red);"></i> <b>EAC3 / Dolby Audio Supported Out-of-the-Box</b></li>
+                <li><i class="fa-solid fa-bolt" style="color: var(--g-yellow);"></i> <b>Context-Aware Playback Queue</b> (Folder, Playlist, Favorites)</li>
+                <li><i class="fa-solid fa-list-check" style="color: var(--g-blue);"></i> <b>Bulk Selection</b> (Audio & Video)</li>
+                <li><i class="fa-solid fa-folder-open" style="color: var(--g-green);"></i> <b>Advanced Folder Navigation</b></li>
+            </ul>
+        </div>
+
+        <div class="table-container reveal-element">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>SHS Player</th>
+                        <th>VLC</th>
+                        <th>MX Player</th>
+                        <th>mpv</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>EAC3/Dolby Audio</td><td class="highlight-green">✅</td><td>✅</td><td>💰 Paid</td><td>❌</td></tr>
+                    <tr><td>1-Click Subtitles</td><td class="highlight-green">✅</td><td>✅</td><td>✅</td><td>❌</td></tr>
+                    <tr><td>Audio Delay/Sync</td><td class="highlight-green">✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+                    <tr><td>Custom UI Buttons</td><td class="highlight-green">✅</td><td>❌</td><td>❌</td><td>❌</td></tr>
+                    <tr><td>Screenshot Capture</td><td class="highlight-green">✅</td><td>❌</td><td>✅</td><td>❌</td></tr>
+                    <tr><td>Video-to-Audio</td><td class="highlight-green">✅</td><td>❌</td><td>💰 Paid</td><td>❌</td></tr>
+                    <tr><td>Dedicated Audio UI</td><td class="highlight-green">✅</td><td>✅</td><td>❌</td><td>❌</td></tr>
+                    <tr><td>Privacy Vault</td><td class="highlight-green">✅</td><td>❌</td><td>❌</td><td>❌</td></tr>
+                    <tr><td>Wi-Fi Transfer</td><td class="highlight-green">✅</td><td>❌</td><td>❌</td><td>❌</td></tr>
+                    <tr><td>Material You Theme</td><td class="highlight-green">✅</td><td>❌</td><td>❌</td><td>❌</td></tr>
+                    <tr><td>Ad-Free</td><td class="highlight-green">✅</td><td>✅</td><td>❌</td><td>✅</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Screenshots -->
+    <section class="section-apple 3d-container">
+        <h2 class="section-title reveal-element">
+            📸 <span class="highlight-yellow">App</span> <span class="highlight-red">Screenshots</span>
+        </h2>
+        <p style="text-align: center; margin-bottom: 30px; font-weight: 600; color: var(--text-sub);" class="reveal-element">A glimpse into the ultimate media experience.</p>
+        
+        <div class="screenshot-grid reveal-element">
+            <div class="screenshot-card">
+                <img src="https://i.postimeg.cc/a76f7309a65a4a4889aa7503a982a938.jpg" alt="Home Screen">
+                <h4 style="text-align: center; padding: 10px 0;">Home Screen</h4>
+            </div>
+            <div class="screenshot-card">
+                <img src="https://i.postimeg.cc/bc9475c4ccbb4935bf3e8f718f8ae0f8.jpg" alt="Quick Settings">
+                <h4 style="text-align: center; padding: 10px 0;">Video Quick Settings</h4>
+            </div>
+            <div class="screenshot-card">
+                <img src="https://i.postimeg.cc/0a4bc2c38b0e4cc4ab99c9b493a73ef2.jpg" alt="Video Player">
+                <h4 style="text-align: center; padding: 10px 0;">Video Player</h4>
+            </div>
+            <div class="screenshot-card">
+                <img src="https://i.postimeg.cc/fa3d430185b348978c6ddd50edaa97c8.jpg" alt="Player Setting">
+                <h4 style="text-align: center; padding: 10px 0;">Player Settings</h4>
+            </div>
+            <div class="screenshot-card">
+                <img src="https://i.postimeg.cc/3b394f2da2e7425fbbf8c2de2ba0242c.jpg" alt="Music List">
+                <h4 style="text-align: center; padding: 10px 0;">Music Library</h4>
+            </div>
+            <div class="screenshot-card">
+                <img src="https://i.postimeg.cc/2141ab4ceaa24c5391c421485d9c759f.jpg" alt="Music Folders">
+                <h4 style="text-align: center; padding: 10px 0;">Music Folders</h4>
+            </div>
+            <div class="screenshot-card">
+                <img src="https://i.postimeg.cc/ed55e0794a6b408a8ecf158dcb31d1b3.jpg" alt="Music Settings">
+                <h4 style="text-align: center; padding: 10px 0;">Music Settings</h4>
+            </div>
+            <div class="screenshot-card">
+                <img src="https://i.postimeg.cc/cc44d142a49f4df7bfc509f1c54dc71b.jpg" alt="About Page">
+                <h4 style="text-align: center; padding: 10px 0;">About & Contact</h4>
+            </div>
+            <div class="screenshot-card">
+                <img src="https://i.postimeg.cc/1c3a2027f651467bbe001fb6d1a479e2.jpg" alt="Settings">
+                <h4 style="text-align: center; padding: 10px 0;">Main Settings</h4>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cinematic & Arsenal Features -->
+    <section class="section-apple 3d-container" id="experience" style="background: #fff;">
+        <h2 class="section-title reveal-element">
+            🍿 Cinematic <span class="highlight-blue">Video</span> Experience
+        </h2>
+
+        <div class="features-grid">
+            <div class="feature-card reveal-element">
+                <h3 class="highlight-red"><i class="fa-solid fa-clapperboard"></i> Decoder Engine</h3>
+                <ul style="margin-top: 15px; line-height: 1.8; color: var(--text-sub);">
+                    <li><kbd>HW/SW Decoder Switch</kbd> Force hardware/software decoding</li>
+                    <li><kbd>EAC3 / Dolby</kbd> Direct FFmpeg support</li>
+                    <li><kbd>HDR & 10-bit HEVC</kbd> HW accelerated</li>
+                    <li><kbd>Network Protocols</kbd> RTSP, RTMP, HLS, DASH, HTTP, MMS, UDP</li>
+                </ul>
+            </div>
+            <div class="feature-card reveal-element" style="border-top-color: var(--g-yellow);">
+                <h3 class="highlight-yellow"><i class="fa-solid fa-hand"></i> Gestures</h3>
+                <ul style="margin-top: 15px; line-height: 1.8; color: var(--text-sub);">
+                    <li><b>Custom Menu:</b> Edit, remove, rearrange buttons</li>
+                    <li><b>Volume/Brightness:</b> Swipe edges</li>
+                    <li><b>Seek:</b> Swipe left/right, hold to preview</li>
+                    <li><b>Double Tap:</b> Configurable FF/Rewind</li>
+                    <li><b>Long Press:</b> 2x–4x speed boost</li>
+                    <li><b>Pinch & Pan:</b> Zoom/zoom out</li>
+                </ul>
+            </div>
+            <div class="feature-card reveal-element" style="border-top-color: var(--g-green);">
+                <h3 class="highlight-green"><i class="fa-solid fa-closed-captioning"></i> Subtitles</h3>
+                <ul style="margin-top: 15px; line-height: 1.8; color: var(--text-sub);">
+                    <li><b>1-Click Online:</b> OpenSubtitles API</li>
+                    <li><b>Formats:</b> SRT, ASS, SSA, VTT, TTML + Embedded</li>
+                    <li><b>Deep Customization:</b> Font, size, opacity, encoding</li>
+                </ul>
+            </div>
+            <div class="feature-card reveal-element" style="border-top-color: var(--g-red);">
+                <h3 class="highlight-red"><i class="fa-solid fa-wand-magic-sparkles"></i> Effects</h3>
+                <ul style="margin-top: 15px; line-height: 1.8; color: var(--text-sub);">
+                    <li><b>🎧 Audio Sync:</b> Millisecond delay/forward</li>
+                    <li><b>🎛️ EQ:</b> Audio/Video frequency tuning</li>
+                    <li><b>🎙️ Voice Changer:</b> Deep, Robot, Child, Echo</li>
+                    <li><b>🔊 Volume Boost:</b> Up to 200%</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2 class="section-title reveal-element" style="margin-top: 80px;">
+            🎬 The Creator's <span class="highlight-red">Arsenal</span>
+        </h2>
+
+        <div class="features-grid">
+            <div class="feature-card reveal-element" style="border-top-color: var(--g-blue);">
+                <h3 class="highlight-blue">📸 One-Tap Screenshot</h3>
+                <p style="color: var(--text-sub);">Pixel-perfect frames using PixelCopy API.</p>
+            </div>
+            <div class="feature-card reveal-element" style="border-top-color: var(--g-red);">
+                <h3 class="highlight-red">✂️ Video Trim/Cut</h3>
+                <p style="color: var(--text-sub);">Export clips directly via MediaMuxer — zero quality loss.</p>
+            </div>
+            <div class="feature-card reveal-element" style="border-top-color: var(--g-yellow);">
+                <h3 class="highlight-yellow">🎵 Video-to-Audio</h3>
+                <p style="color: var(--text-sub);">Extract audio track and save as M4A.</p>
+            </div>
+            <div class="feature-card reveal-element" style="border-top-color: var(--g-green);">
+                <h3 class="highlight-green">🔁 A-B Repeat</h3>
+                <p style="color: var(--text-sub);">Seamless looping between specific points.</p>
+            </div>
+            <div class="feature-card reveal-element" style="border-top-color: var(--g-blue);">
+                <h3 class="highlight-blue">🪞 Mirror Mode</h3>
+                <p style="color: var(--text-sub);">Flip video horizontally for composition/dance.</p>
+            </div>
+            <div class="feature-card reveal-element" style="border-top-color: var(--g-red);">
+                <h3 class="highlight-red">🔖 Bookmarks</h3>
+                <p style="color: var(--text-sub);">Save custom timestamps with labels.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Music, Vault, Wi-Fi -->
+    <section class="section-apple 3d-container">
+        <h2 class="section-title reveal-element">
+            Engine <span class="highlight-green">Core</span>
+        </h2>
+
+        <div class="features-grid">
+            <!-- Music -->
+            <div class="marble-panel reveal-element" style="padding: 40px;">
+                <h2 class="highlight-green" style="font-size: 2rem; margin-bottom: 20px;">🎵 Music Engine</h2>
+                <p style="color: var(--text-sub); margin-bottom: 20px;">A fully separate, beautifully animated Dedicated Audio UI.</p>
+                <ul style="list-style: none; line-height: 2;">
+                    <li><i class="fa-solid fa-compact-disc" style="color: var(--g-green);"></i> Dedicated Player (Spinning art)</li>
+                    <li><i class="fa-solid fa-folder-tree" style="color: var(--g-green);"></i> Smart Folder Navigation</li>
+                    <li><i class="fa-solid fa-arrow-down-long" style="color: var(--g-green);"></i> Fast Scroll Gesture</li>
+                    <li><i class="fa-solid fa-list" style="color: var(--g-green);"></i> Queue & Playlist inside UI</li>
+                    <li><i class="fa-solid fa-circle-play" style="color: var(--g-green);"></i> Background Play (Media3 Session)</li>
+                </ul>
+            </div>
+
+            <!-- Vault -->
+            <div class="marble-panel marble-panel-red reveal-element" style="padding: 40px;">
+                <h2 class="highlight-red" style="font-size: 2rem; margin-bottom: 20px;">🔒 Privacy Vault</h2>
+                <p style="color: var(--text-sub); margin-bottom: 20px;">Password-protected, biometric-secured vault.</p>
+                <ul style="list-style: none; line-height: 2;">
+                    <li><i class="fa-solid fa-fingerprint" style="color: var(--g-red);"></i> Biometric Auth</li>
+                    <li><i class="fa-solid fa-question-circle" style="color: var(--g-red);"></i> Security Question Recovery</li>
+                    <li><i class="fa-solid fa-play-circle" style="color: var(--g-red);"></i> Play Internal (FileProvider)</li>
+                    <li><i class="fa-solid fa-rotate" style="color: var(--g-red);"></i> Seamless Restore (MediaScanner)</li>
+                    <li><i class="fa-solid fa-shield-halved" style="color: var(--g-red);"></i> App-Private Storage Invisible to Gallery</li>
+                </ul>
+            </div>
+
+            <!-- Wi-Fi -->
+            <div class="marble-panel marble-panel-yellow reveal-element" style="padding: 40px;">
+                <h2 class="highlight-yellow" style="font-size: 2rem; margin-bottom: 20px;">📡 Wi-Fi Transfer</h2>
+                <p style="color: var(--text-sub); margin-bottom: 20px;">Completely rewritten with advanced security.</p>
+                <ul style="list-style: none; line-height: 2;">
+                    <li><i class="fa-solid fa-camera" style="color: var(--g-yellow);"></i> CameraX + MLKit Scanning</li>
+                    <li><i class="fa-solid fa-qrcode" style="color: var(--g-yellow);"></i> ZXing QR Generation</li>
+                    <li><i class="fa-solid fa-server" style="color: var(--g-yellow);"></i> NanoHTTPD Server :8080</li>
+                    <li><i class="fa-solid fa-key" style="color: var(--g-yellow);"></i> Auth Token Security</li>
+                    <li><i class="fa-solid fa-globe" style="color: var(--g-yellow);"></i> Cross-Platform Support</li>
+                </ul>
+                <div class="code-block" style="margin-top: 20px; font-size: 0.8rem;">
+[Device A] --QR/URL--> [Device B]
+[Sender]   --Upload-->  [Receiver :8080]
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- UI, Architecture & Tech Deep Dives -->
+    <section class="section-apple 3d-container" id="tech" style="background: #fff;">
+        <h2 class="section-title reveal-element">
+            Deep <span class="highlight-blue">Dive</span>
+        </h2>
+
+        <div style="max-width: 900px; margin: 0 auto; width: 100%;">
+            <details class="reveal-element">
+                <summary>📱 Modern & Intuitive UI</summary>
+                <div class="details-content">
+                    <h4>Bottom Navigation Bar</h4>
+                    <table>
+                        <tr><td><b>Videos</b> 🎬</td><td>Browse video library, tree navigation, quick settings</td></tr>
+                        <tr><td><b>Music</b> 🎵</td><td>Full music player with library management</td></tr>
+                        <tr><td><b>Me</b> 👤</td><td>Privacy Vault, File Transfer, About, Settings</td></tr>
+                        <tr><td><b>Telegram</b> 💬</td><td>Developer info, community, donations</td></tr>
+                    </table>
+                    <br>
+                    <h4>Browser & Layouts</h4>
+                    <ul>
+                        <li><b>Folder / Tree View:</b> Deep navigation.</li>
+                        <li><b>Fast Scroller:</b> Side drag gesture for quick list jumping.</li>
+                        <li><b>Thumbnail Previews:</b> Coil-powered caching.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details class="reveal-element">
+                <summary>🎨 Appearance & Theming</summary>
+                <div class="details-content">
+                    <ul>
+                        <li><b>Theme Engine Fixed:</b> SharedPreferences instantly applies themes globally.</li>
+                        <li><b>Material You:</b> Dynamic colors adapt to your wallpaper (Android 12+).</li>
+                        <li><b>Modes:</b> System Default / Light / Dark / High Contrast Dark.</li>
+                        <li><b>Splash Screen:</b> AndroidX Splashscreen API for smooth branding transitions.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details class="reveal-element">
+                <summary>⚙️ Complete Settings Reference</summary>
+                <div class="details-content">
+                    <p>9 comprehensive categories including: Appearance, Media Library, Player, Decoder, Audio, Subtitle, General, About, and Libraries. Full granular control over your media experience.</p>
+                </div>
+            </details>
+
+            <details class="reveal-element">
+                <summary>🏗️ Architecture Deep Dive</summary>
+                <div class="details-content">
+                    <p>Follows <b>Clean Architecture</b> across 11 Gradle modules.</p>
+                    <ul>
+                        <li><b>MVVM</b> + StateFlow</li>
+                        <li><b>Hilt Dependency Injection</b></li>
+                        <li><b>Room Database</b> (v4 Schema Migrations)</li>
+                        <li><b>Media3 Session</b> for Background Services</li>
+                        <li><b>Global Crash Handler</b></li>
+                    </ul>
+                </div>
+            </details>
+
+            <details class="reveal-element">
+                <summary>🧩 Module Structure</summary>
+                <div class="details-content">
+                    <p>Structured cleanly into:</p>
+                    <p><code>:app, :core:common, :core:data, :core:database, :core:datastore, :core:domain, :core:media, :core:model, :core:ui, :feature:player, :feature:settings, :feature:videopicker</code></p>
+                </div>
+            </details>
+
+            <details class="reveal-element">
+                <summary>📚 Tech Stack & Dependencies</summary>
+                <div class="details-content">
+                    <ul>
+                        <li><b>Kotlin 2.3.0</b> & <b>Compose BOM 2026.01.00</b></li>
+                        <li><b>Media3 (ExoPlayer) 1.9.2</b> + <b>NextLib FFmpeg</b></li>
+                        <li><b>Room 2.8.4</b>, <b>DataStore 1.2.0</b></li>
+                        <li><b>CameraX 1.4.1</b> + <b>MLKit 17.3.0</b> + <b>ZXing</b></li>
+                        <li><b>OpenSubtitles REST API</b>, <b>NanoHTTPD</b></li>
+                    </ul>
+                </div>
+            </details>
+
+            <details class="reveal-element">
+                <summary>🔧 Build Variants & Configuration</summary>
+                <div class="details-content">
+                    <p>Targeting SDK 36 (Android 16), JVM 17. Supports all ABIs (<code>arm64-v8a</code>, <code>armeabi-v7a</code>, <code>x86</code>, <code>x86_64</code>). Build with <code>./gradlew assembleRelease</code>.</p>
+                </div>
+            </details>
+
+            <details class="reveal-element">
+                <summary>🤖 CI/CD Pipeline & Fastlane Deployment</summary>
+                <div class="details-content">
+                    <p>Automated builds, APK testing, version bumping, and automated publishing to the Google Play Store (Internal Track) via Fastlane and GitHub Actions.</p>
+                </div>
+            </details>
+
+            <details class="reveal-element">
+                <summary>🌍 Translations (40+ Languages)</summary>
+                <div class="details-content">
+                    <p>SHS Player is translated into 40+ languages natively, including Bengali (<code>bn</code>), Hindi (<code>hi</code>), Spanish (<code>es</code>), and more.</p>
+                </div>
+            </details>
+
+            <details class="reveal-element">
+                <summary>📜 License & Privacy</summary>
+                <div class="details-content">
+                    <h4>License</h4>
+                    <p>SHS Player is licensed under the <b>GNU General Public License v3.0</b>. Full license text: LICENSE. Forked from Next Player by Anil Kumar Beesetti.</p>
+                    <br>
+                    <h4>🔒 Privacy Policy</h4>
+                    <p>SHS Player <b>does not collect or access any personal information</b>. All processing happens locally on your device. Wi-Fi File Transfer stays strictly on your local network. Privacy Vault files are encrypted in App-Private Storage.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- Community & Support -->
+    <section class="section-apple 3d-container" id="community">
+        <h2 class="section-title reveal-element">
+            🤝 Community & <span class="highlight-red">Support</span>
+        </h2>
+        
+        <p style="text-align: center; max-width: 600px; margin: 0 auto 40px; font-weight: 600; color: var(--text-sub);" class="reveal-element">
+            Be a part of our ecosystem! Get the latest updates, movie drops, and directly connect with the developer.
+        </p>
+
+        <div class="community-grid reveal-element">
+            <a href="https://t.me/aamoviesofficial" class="community-btn" style="background: #2CA5E0;"><i class="fa-brands fa-telegram"></i> Join Telegram</a>
+            <a href="https://fb.com/itsshsshobuj" class="community-btn" style="background: #1877F2;"><i class="fa-brands fa-facebook"></i> Facebook</a>
+            <a href="https://github.com/The-JDdev" class="community-btn" style="background: #333;"><i class="fa-brands fa-github"></i> GitHub</a>
+        </div>
+
+        <div class="marble-panel reveal-element" style="max-width: 800px; margin: 60px auto 0; padding: 40px; text-align: center; border-left-color: var(--g-yellow);">
+            <h3 class="highlight-yellow" style="font-size: 2rem; margin-bottom: 20px;">💎 Donation Vault</h3>
+            <p style="color: var(--text-sub); margin-bottom: 30px;">
+                If SHS Player has empowered your workflow, your support directly funds continued development, server costs, API testing, and new feature research. Every contribution — no matter the size — is felt by a solo developer building something real from a smartphone in Bangladesh.
+            </p>
+            <div class="donation-grid">
+                <div class="donation-item">
+                    <div>
+                        <b style="color: var(--g-green);">USDT (TRC20)</b>
+                        <span class="crypto-address" id="addr-usdt">TH75J4zaMPwhyR3QxEFdwTCgU2Pp3yPUEr</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyToClipboard('TH75J4zaMPwhyR3QxEFdwTCgU2Pp3yPUEr', this)"><i class="fa-regular fa-copy"></i></button>
+                </div>
+                <div class="donation-item">
+                    <div>
+                        <b style="color: var(--g-blue);">WebMoney WMT</b>
+                        <span class="crypto-address" id="addr-wmt">T202226490170</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyToClipboard('T202226490170', this)"><i class="fa-regular fa-copy"></i></button>
+                </div>
+                <div class="donation-item">
+                    <div>
+                        <b style="color: var(--g-red);">WebMoney WMZ</b>
+                        <span class="crypto-address" id="addr-wmz">Z430378899900</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyToClipboard('Z430378899900', this)"><i class="fa-regular fa-copy"></i></button>
+                </div>
+                <div class="donation-item">
+                    <div>
+                        <b style="color: var(--g-yellow);">bKash (Local)</b>
+                        <span class="crypto-address" id="addr-bkash">01310211442</span>
+                    </div>
+                    <button class="copy-btn" onclick="copyToClipboard('01310211442', this)"><i class="fa-regular fa-copy"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p style="font-size: 1.2rem; margin-bottom: 10px;">Built with 🔥 from Bangladesh · By Sajjad Hussain Shobuj (SHS)</p>
+        <p style="font-family: 'Dela Gothic One', cursive; color: var(--text-sub);">"In a world of ad-filled players, be the engine."</p>
+        <br>
+        <a href="https://github.com/The-JDdev/SHS-Player" style="color: var(--text-main); text-decoration: none; margin: 0 10px;"><i class="fa-solid fa-star"></i> Star this repo</a>
+        <a href="https://github.com/The-JDdev/SHS-Player" style="color: var(--text-main); text-decoration: none; margin: 0 10px;"><i class="fa-solid fa-code-fork"></i> Forks</a>
+    </footer>
+
+    <!-- Script -->
+    <script>
+        // Scroll Reveal Animation
+        const revealElements = document.querySelectorAll('.reveal-element');
+
+        const revealOnScroll = () => {
+            const windowHeight = window.innerHeight;
+            const revealPoint = 150;
+
+            revealElements.forEach(el => {
+                const elementTop = el.getBoundingClientRect().top;
+                if (elementTop < windowHeight - revealPoint) {
+                    el.classList.add('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', revealOnScroll);
+        window.addEventListener('load', revealOnScroll);
+
+        // 3D Tilt effect based on mouse movement
+        document.addEventListener('mousemove', (e) => {
+            const panels = document.querySelectorAll('.marble-panel, .feature-card');
+            panels.forEach(panel => {
+                const rect = panel.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const mouseX = e.clientX - centerX;
+                const mouseY = e.clientY - centerY;
+
+                // Only apply 3D tilt if mouse is reasonably close to the element
+                const distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
+                if (distance < 500) {
+                    const rotateY = (mouseX / 60) * -1;
+                    const rotateX = (mouseY / 60);
+                    // Limit rotation to prevent clipping outside screen bounds
+                    const clampedRotateY = Math.max(-5, Math.min(5, rotateY));
+                    const clampedRotateX = Math.max(-5, Math.min(5, rotateX));
+                    
+                    panel.style.transform = `perspective(1000px) rotateX(${clampedRotateX}deg) rotateY(${clampedRotateY}deg) translateZ(10px)`;
+                } else {
+                    panel.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+                }
+            });
+        });
+
+        // Copy to Clipboard functionality
+        function copyToClipboard(text, buttonElement) {
+            navigator.clipboard.writeText(text).then(() => {
+                const icon = buttonElement.querySelector('i');
+                // Change icon to checkmark
+                icon.classList.remove('fa-copy');
+                icon.classList.add('fa-check');
+                
+                // Change button color briefly
+                buttonElement.style.background = '#34A853'; // Google Green
+
+                setTimeout(() => {
+                    // Revert icon and color after 2 seconds
+                    icon.classList.remove('fa-check');
+                    icon.classList.add('fa-copy');
+                    buttonElement.style.background = '#4285F4'; // Google Blue
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
