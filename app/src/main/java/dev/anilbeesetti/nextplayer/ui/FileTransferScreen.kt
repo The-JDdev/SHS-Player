@@ -39,6 +39,9 @@ import dev.anilbeesetti.nextplayer.core.ui.designsystem.NextIcons
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import fi.iki.elonen.NanoHTTPD
+import fi.iki.elonen.NanoHTTPD.IHTTPSession
+import fi.iki.elonen.NanoHTTPD.Response
 import java.io.File
 import java.io.InputStream
 import java.net.ServerSocket
@@ -86,111 +89,101 @@ fun queryMediaItems(context: Context, uri: Uri, mediaType: String): SelectedMedi
     }.getOrNull()
 }
 
-class SimpleFileServer(
+class VaultHttpServer(
     private val context: Context,
-    private val port: Int,
-    val authToken: String = UUID.randomUUID().toString(),
-) {
-    private var serverSocket: ServerSocket? = null
-    @Volatile var isRunning = false
-    @Volatile private var _receivedFiles = listOf<File>()
-    val receivedFiles: List<File> get() = _receivedFiles
+    port: Int = 8080,
+) : fi.iki.elonen.NanoHTTPD(port) {
+
+    val authToken: String = java.util.UUID.randomUUID().toString().replace("-", "").take(16)
+    val receivedFiles = mutableListOf<File>()
     var onFileReceived: ((File) -> Unit)? = null
 
-    fun start() {
-        if (isRunning) return
-        isRunning = true
-        Thread {
-            try {
-                serverSocket = ServerSocket(port)
-                while (isRunning) {
-                    val client = try {
-                        serverSocket?.accept() ?: break
-                    } catch (e: Exception) {
-                        if (!isRunning) break else continue
+    private val uploadHtml: String by lazy {
+        """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SHS Player — File Upload</title>
+<style>
+body{font-family:system-ui,sans-serif;background:#111;color:#eee;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:24px;box-sizing:border-box}
+h1{color:#4fc3f7;margin-bottom:8px}
+p{color:#aaa;margin-bottom:24px}
+.card{background:#1e1e1e;border-radius:16px;padding:32px;max-width:480px;width:100%;box-shadow:0 8px 32px #0008}
+label{display:block;margin-bottom:8px;font-weight:600}
+input[type=file]{width:100%;padding:12px;background:#2a2a2a;border:1.5px dashed #4fc3f7;border-radius:8px;color:#eee;cursor:pointer;margin-bottom:20px;box-sizing:border-box}
+button{width:100%;padding:14px;background:#4fc3f7;color:#000;border:none;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer}
+button:hover{background:#81d4fa}
+.status{margin-top:16px;text-align:center;color:#81c784;min-height:24px}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>📱 SHS Player</h1>
+<p>Upload files to the Privacy Vault on this device</p>
+<form method="POST" enctype="multipart/form-data" action="/upload?token=$authToken" id="form">
+<label>Select files to upload:</label>
+<input type="file" name="files" multiple accept="video/*,audio/*">
+<button type="submit">Upload to Vault</button>
+</form>
+<div class="status" id="status"></div>
+</div>
+<script>
+document.getElementById('form').onsubmit=function(){
+  document.getElementById('status').textContent='Uploading…';
+};
+</script>
+</body>
+</html>"""
+    }
+
+    override fun serve(session: IHTTPSession): Response {
+        val method = session.method
+        val uri = session.uri
+        val params = session.parms
+
+        return when {
+            // GET / — serve the upload HTML page
+            method == Method.GET && (uri == "/" || uri == "") -> {
+                newFixedLengthResponse(Response.Status.OK, "text/html; charset=utf-8", uploadHtml)
+            }
+
+            // POST /upload — receive files
+            method == Method.POST && uri.startsWith("/upload") -> {
+                // Auth token check
+                val token = params["token"] ?: ""
+                if (token != authToken) {
+                    return newFixedLengthResponse(Response.Status.FORBIDDEN, "text/plain", "403 Forbidden — invalid token")
+                }
+                try {
+                    val files = mutableMapOf<String, String>()
+                    session.parseBody(files)
+                    val uploadDir = getVaultDir(context, "videos").also { it.mkdirs() }
+                    var savedCount = 0
+                    files.forEach { (key, tmpPath) ->
+                        val originalName = params[key] ?: session.parms[key] ?: key
+                        // Path traversal protection — strip any directory components
+                        val safeName = java.io.File(originalName).name
+                            .replace("..", "").replace("/", "").replace("\\", "")
+                            .ifBlank { "upload_${System.currentTimeMillis()}" }
+                        val destFile = java.io.File(uploadDir, "${System.currentTimeMillis()}_$safeName")
+                        java.io.File(tmpPath).copyTo(destFile, overwrite = true)
+                        synchronized(receivedFiles) { receivedFiles.add(destFile) }
+                        onFileReceived?.invoke(destFile)
+                        savedCount++
                     }
-                    Thread { handleClient(client) }.start()
+                    newFixedLengthResponse(
+                        Response.Status.OK, "text/html; charset=utf-8",
+                        """<html><body style="font-family:system-ui;background:#111;color:#eee;text-align:center;padding:40px">
+<h2 style="color:#81c784">✓ $savedCount file(s) saved to vault!</h2>
+<a href="/" style="color:#4fc3f7">Upload more</a></body></html>"""
+                    )
+                } catch (e: Exception) {
+                    newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "text/plain", "Upload error: ${e.message}")
                 }
-            } catch (e: Exception) {
-                android.util.Log.e("SimpleFileServer", "Server failed to start", e)
-                isRunning = false
-            }
-        }.start()
-    }
-
-    fun stop() {
-        isRunning = false
-        try { serverSocket?.close() } catch (_: Exception) {}
-    }
-
-    private fun sanitizeFileName(raw: String): String {
-        val stripped = raw.replace('/', '_').replace('\\', '_').replace('\u0000', '_')
-        val name = File(stripped).name
-        if (name.isBlank() || name == "." || name == "..") {
-            return "received_${System.currentTimeMillis()}"
-        }
-        return name
-    }
-
-    private fun handleClient(socket: Socket) {
-        try {
-            val inputStream = socket.getInputStream()
-            val headerBuf = StringBuilder()
-            var prev3 = 0; var prev2 = 0; var prev1 = 0
-            while (true) {
-                val b = inputStream.read()
-                if (b == -1) break
-                headerBuf.append(b.toChar())
-                if (prev3 == '\r'.code && prev2 == '\n'.code && prev1 == '\r'.code && b == '\n'.code) break
-                prev3 = prev2; prev2 = prev1; prev1 = b
-            }
-            val lines = headerBuf.toString().trimEnd().split("\r\n")
-            val requestLine = lines.firstOrNull() ?: return
-            val headers = mutableMapOf<String, String>()
-            lines.drop(1).forEach { line ->
-                val idx = line.indexOf(":")
-                if (idx > 0) headers[line.substring(0, idx).trim().lowercase()] = line.substring(idx + 1).trim()
             }
 
-            val clientToken = headers["x-auth-token"] ?: ""
-            if (clientToken != authToken) {
-                socket.getOutputStream().write("HTTP/1.1 403 Forbidden\r\nContent-Length: 12\r\n\r\nUnauthorized".toByteArray())
-                return
-            }
-
-            if (requestLine.startsWith("POST")) {
-                val rawName = headers["x-filename"] ?: "received_${System.currentTimeMillis()}"
-                val fileName = sanitizeFileName(rawName)
-                val contentLength = headers["content-length"]?.toLongOrNull() ?: -1L
-                val recvDir = File(context.filesDir, "transfers/received")
-                recvDir.mkdirs()
-                val destFile = File(recvDir, fileName)
-                val canonical = destFile.canonicalPath
-                if (!canonical.startsWith(recvDir.canonicalPath + File.separator)) {
-                    socket.getOutputStream().write("HTTP/1.1 400 Bad Request\r\nContent-Length: 16\r\n\r\nInvalid filename".toByteArray())
-                    return
-                }
-                destFile.outputStream().use { out ->
-                    val buf = ByteArray(8192)
-                    var remaining = contentLength
-                    while (remaining != 0L) {
-                        val toRead = if (remaining > 0) minOf(buf.size.toLong(), remaining).toInt() else buf.size
-                        val read = inputStream.read(buf, 0, toRead)
-                        if (read == -1) break
-                        out.write(buf, 0, read)
-                        if (remaining > 0) remaining -= read
-                    }
-                }
-                synchronized(this) { _receivedFiles = _receivedFiles + destFile }
-                onFileReceived?.invoke(destFile)
-                socket.getOutputStream().write("HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK".toByteArray())
-            } else {
-                socket.getOutputStream().write("HTTP/1.1 200 OK\r\nContent-Length: 15\r\n\r\nSHS File Server".toByteArray())
-            }
-        } catch (e: Exception) {
-            android.util.Log.e("SimpleFileServer", "Error handling client", e)
-        } finally {
-            try { socket.close() } catch (_: Exception) {}
+            else -> newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain", "404 Not Found")
         }
     }
 }
@@ -502,7 +495,7 @@ fun ReceiveView(context: Context) {
     val scope = rememberCoroutineScope()
     var serverState by remember { mutableStateOf<ReceiveServerState>(ReceiveServerState.Idle) }
     var receivedFiles by remember { mutableStateOf<List<String>>(emptyList()) }
-    var server by remember { mutableStateOf<SimpleFileServer?>(null) }
+    var server by remember { mutableStateOf<VaultHttpServer?>(null) }
     var showPermDialog by remember { mutableStateOf(false) }
 
     val requiredPermissions = buildList {
@@ -564,7 +557,7 @@ fun ReceiveView(context: Context) {
                         scope.launch(Dispatchers.IO) {
                             try {
                                 val port = (10000..65000).random()
-                                val newServer = SimpleFileServer(context, port)
+                                val newServer = VaultHttpServer(context, port)
                                 newServer.start()
                                 val ip = getWifiIpAddress(context) ?: "0.0.0.0"
                                 val url = "http://$ip:$port?token=${newServer.authToken}"
