@@ -76,6 +76,19 @@ fun getWifiIpAddress(context: Context): String? {
 
 data class SelectedMediaItem(val uri: Uri, val name: String, val size: Long, val type: String)
 
+fun scanFileToMediaStore(context: Context, file: File) {
+    val ext = file.name.substringAfterLast('.', "").lowercase()
+    val mimeType = android.webkit.MimeTypeMap.getSingleton()
+        .getMimeTypeFromExtension(ext) ?: "application/octet-stream"
+    android.media.MediaScannerConnection.scanFile(
+        context,
+        arrayOf(file.absolutePath),
+        arrayOf(mimeType),
+    ) { _, _ -> /* scan complete */ }
+}
+
+// formatFileSize is defined in MusicScreen.kt — reuse from there
+
 fun queryMediaItems(context: Context, uri: Uri, mediaType: String): SelectedMediaItem? {
     return runCatching {
         context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
@@ -137,10 +150,24 @@ document.getElementById('form').onsubmit=function(){
 </html>"""
     }
 
+    private fun extractToken(session: IHTTPSession): String {
+        // 1) Check query parameters from URI
+        val uri = session.uri ?: ""
+        val queryToken = Uri.parse(uri).getQueryParameter("token") ?: ""
+        if (queryToken.isNotEmpty()) return queryToken
+        // 2) Check session.parms (NanoHTTPD puts query params here)
+        val parmsToken = session.parms["token"] ?: ""
+        if (parmsToken.isNotEmpty()) return parmsToken
+        // 3) Check X-Auth-Token header (for octet-stream uploads)
+        val headerToken = session.headers["x-auth-token"] ?: ""
+        return headerToken
+    }
+
     override fun serve(session: IHTTPSession): Response {
         val method = session.method
         val uri = session.uri
         val params = session.parms
+        val contentType = session.headers["content-type"] ?: ""
 
         return when {
             // GET / — serve the upload HTML page
@@ -148,10 +175,10 @@ document.getElementById('form').onsubmit=function(){
                 newFixedLengthResponse(Response.Status.OK, "text/html; charset=utf-8", uploadHtml)
             }
 
-            // POST /upload — receive files
-            method == Method.POST && uri.startsWith("/upload") -> {
+            // POST /upload — receive files (multipart form data)
+            method == Method.POST && uri.startsWith("/upload") && contentType.contains("multipart/form-data", ignoreCase = true) -> {
                 // Auth token check
-                val token = params["token"] ?: ""
+                val token = extractToken(session)
                 if (token != authToken) {
                     return newFixedLengthResponse(Response.Status.FORBIDDEN, "text/plain", "403 Forbidden — invalid token")
                 }
@@ -170,6 +197,7 @@ document.getElementById('form').onsubmit=function(){
                         java.io.File(tmpPath).copyTo(destFile, overwrite = true)
                         synchronized(receivedFiles) { receivedFiles.add(destFile) }
                         onFileReceived?.invoke(destFile)
+                        scanFileToMediaStore(context, destFile)
                         savedCount++
                     }
                     newFixedLengthResponse(
@@ -178,6 +206,44 @@ document.getElementById('form').onsubmit=function(){
 <h2 style="color:#81c784">✓ $savedCount file(s) saved to vault!</h2>
 <a href="/" style="color:#4fc3f7">Upload more</a></body></html>"""
                     )
+                } catch (e: Exception) {
+                    newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "text/plain", "Upload error: ${e.message}")
+                }
+            }
+
+            // POST /upload — receive files (application/octet-stream from sender app)
+            method == Method.POST && uri.startsWith("/upload") && contentType.contains("application/octet-stream", ignoreCase = true) -> {
+                val token = extractToken(session)
+                if (token != authToken) {
+                    return newFixedLengthResponse(Response.Status.FORBIDDEN, "text/plain", "403 Forbidden — invalid token")
+                }
+                try {
+                    val filename = session.headers["x-filename"] ?: "upload_${System.currentTimeMillis()}"
+                    // Path traversal protection
+                    val safeName = java.io.File(filename).name
+                        .replace("..", "").replace("/", "").replace("\\", "")
+                        .ifBlank { "upload_${System.currentTimeMillis()}" }
+                    val uploadDir = getVaultDir(context, "videos").also { it.mkdirs() }
+                    val destFile = java.io.File(uploadDir, "${System.currentTimeMillis()}_$safeName")
+                    val files = mutableMapOf<String, String>()
+                    session.parseBody(files)
+                    // parseBody stores the data in a temp file; find it
+                    val tmpPath = files.values.firstOrNull()
+                    if (tmpPath != null) {
+                        java.io.File(tmpPath).copyTo(destFile, overwrite = true)
+                    } else {
+                        // Fallback: read from input stream directly
+                        val bodySize = session.headers["content-length"]?.toLongOrNull() ?: 0L
+                        if (bodySize > 0L) {
+                            destFile.outputStream().use { out ->
+                                session.inputStream?.copyTo(out)
+                            }
+                        }
+                    }
+                    synchronized(receivedFiles) { receivedFiles.add(destFile) }
+                    onFileReceived?.invoke(destFile)
+                    scanFileToMediaStore(context, destFile)
+                    newFixedLengthResponse(Response.Status.OK, "text/plain", "OK")
                 } catch (e: Exception) {
                     newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "text/plain", "Upload error: ${e.message}")
                 }
@@ -309,6 +375,8 @@ fun SendView(context: Context) {
     var isSending by remember { mutableStateOf(false) }
     var showQrScanner by remember { mutableStateOf(false) }
     var showPermDialog by remember { mutableStateOf(false) }
+    var progressBytes by remember { mutableLongStateOf(0L) }
+    var progressTotal by remember { mutableLongStateOf(0L) }
 
     val requiredPermissions = buildList {
         add(Manifest.permission.CAMERA)
@@ -421,7 +489,23 @@ fun SendView(context: Context) {
                 ),
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(transferStatus, modifier = Modifier.padding(12.dp), style = MaterialTheme.typography.bodyMedium)
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text(transferStatus, style = MaterialTheme.typography.bodyMedium)
+                    if (isSending && progressTotal > 0L) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        val progress = (progressBytes.toFloat() / progressTotal.toFloat()).coerceIn(0f, 1f)
+                        LinearProgressIndicator(
+                            progress = { progress },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            "${formatFileSize(progressBytes)} / ${formatFileSize(progressTotal)}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        )
+                    }
+                }
             }
         }
 
@@ -450,6 +534,9 @@ fun SendView(context: Context) {
                 if (!permissionsState.allPermissionsGranted) { showPermDialog = true; return@Button }
                 if (targetUrl.isBlank()) { transferStatus = "Please enter or scan the receiver's URL."; return@Button }
                 isSending = true
+                val totalSize = selectedFiles.sumOf { it.size }
+                progressTotal = totalSize
+                progressBytes = 0L
                 transferStatus = "Sending ${selectedFiles.size} file(s)..."
                 scope.launch(Dispatchers.IO) {
                     var sent = 0; var failed = 0
@@ -466,7 +553,14 @@ fun SendView(context: Context) {
                             conn.setRequestProperty("Content-Type", "application/octet-stream")
                             conn.connectTimeout = 10000; conn.readTimeout = 60000
                             context.contentResolver.openInputStream(item.uri)?.use { input ->
-                                conn.outputStream.use { out -> input.copyTo(out) }
+                                conn.outputStream.use { out ->
+                                    val buffer = ByteArray(8192)
+                                    var bytesRead: Int
+                                    while (input.read(buffer).also { bytesRead = it } != -1) {
+                                        out.write(buffer, 0, bytesRead)
+                                        progressBytes += bytesRead
+                                    }
+                                }
                             }
                             val code = conn.responseCode
                             conn.disconnect()
@@ -475,6 +569,7 @@ fun SendView(context: Context) {
                     }
                     withContext(Dispatchers.Main) {
                         isSending = false
+                        progressBytes = progressTotal
                         transferStatus = if (failed == 0) "✓ Successfully sent $sent file(s)!"
                         else "Sent: $sent, Failed: $failed"
                     }

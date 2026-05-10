@@ -41,6 +41,9 @@ class AudioPlayerActivity : ComponentActivity() {
         val uri = intent.data ?: run { finish(); return }
         val title = intent.getStringExtra("title") ?: uri.lastPathSegment ?: "Unknown"
         val artist = intent.getStringExtra("artist") ?: "Unknown Artist"
+        val startIndex = intent.getIntExtra("audio_queue_index", 0)
+        @Suppress("DEPRECATION")
+        val queue = intent.getParcelableArrayListExtra<Uri>("audio_queue") ?: arrayListOf(uri)
 
         setContent {
             NextPlayerTheme(darkTheme = true) {
@@ -64,17 +67,26 @@ class AudioPlayerActivity : ComponentActivity() {
             val controller = controllerFuture!!.await()
             mediaController = controller
 
-            val mediaItem = MediaItem.Builder()
-                .setUri(uri)
-                .setMediaId(uri.toString())
-                .setMediaMetadata(
-                    MediaMetadata.Builder()
-                        .setTitle(title)
-                        .setArtist(artist)
-                        .build(),
-                )
-                .build()
-            controller.setMediaItem(mediaItem)
+            val mediaItems = queue.mapIndexed { index, itemUri ->
+                MediaItem.Builder()
+                    .setUri(itemUri)
+                    .setMediaId(itemUri.toString())
+                    .setMediaMetadata(
+                        MediaMetadata.Builder()
+                            .setTitle(
+                                if (index == startIndex) title
+                                else itemUri.lastPathSegment ?: "Track ${index + 1}"
+                            )
+                            .setArtist(
+                                if (index == startIndex) artist
+                                else "Unknown Artist"
+                            )
+                            .build(),
+                    )
+                    .build()
+            }
+
+            controller.setMediaItems(mediaItems, startIndex, 0L)
             controller.playWhenReady = true
             controller.prepare()
 

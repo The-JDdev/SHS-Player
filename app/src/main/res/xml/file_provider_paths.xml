@@ -6,4 +6,10 @@
     <files-path
         name="files_path"
         path="." />
+    <files-path
+        name="vault_videos"
+        path="vault/videos/" />
+    <files-path
+        name="vault_music"
+        path="vault/music/" />
 </paths>

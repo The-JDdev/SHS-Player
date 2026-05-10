@@ -220,10 +220,19 @@ fun playVaultFile(context: Context, vaultFile: VaultFile, mimeType: String) {
         val file = File(vaultFile.vaultPath)
         val authority = context.packageName + ".fileprovider"
         val uri = FileProvider.getUriForFile(context, authority, file)
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, mimeType)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val intent = if (vaultFile.type == "video") {
+            Intent(context, dev.anilbeesetti.nextplayer.feature.player.PlayerActivity::class.java).apply {
+                data = uri
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+        } else {
+            Intent(context, dev.anilbeesetti.nextplayer.feature.player.AudioPlayerActivity::class.java).apply {
+                data = uri
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                putExtra("title", vaultFile.name)
+            }
         }
         context.startActivity(intent)
     }.onFailure {

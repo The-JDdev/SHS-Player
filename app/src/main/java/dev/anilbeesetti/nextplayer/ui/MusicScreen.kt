@@ -36,7 +36,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -83,6 +85,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.anilbeesetti.nextplayer.core.ui.R as coreUiR
+import dev.anilbeesetti.nextplayer.core.ui.composables.FastScrollLazyColumn
+import dev.anilbeesetti.nextplayer.core.ui.composables.FastScrollLazyGrid
 import dev.anilbeesetti.nextplayer.core.ui.designsystem.NextIcons
 import dev.anilbeesetti.nextplayer.feature.player.PlayerActivity
 
@@ -645,54 +649,74 @@ fun MusicFilesList(
         val listBottomPad = if (isSelectionMode) 140.dp else 80.dp
 
         if (layoutMode == MusicLayoutMode.GRID) {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 160.dp),
-                contentPadding = PaddingValues(start = 8.dp, end = 8.dp, top = 8.dp, bottom = listBottomPad),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            val gridState = rememberLazyGridState()
+            FastScrollLazyGrid(
+                lazyGridState = gridState,
                 modifier = Modifier.fillMaxSize(),
+                popupContent = { index ->
+                    songs.getOrNull(index)?.title?.firstOrNull()?.uppercase() ?: ""
+                },
             ) {
-                items(songs, key = { it.id }) { song ->
-                    MusicGridItem(
-                        song = song,
-                        isFavorite = song.id in favoriteIds,
-                        isSelected = song.id in selectedIds,
-                        isSelectionMode = isSelectionMode,
-                        displayPrefs = displayPrefs,
-                        customPlaylists = customPlaylists,
-                        context = context,
-                        queue = songs,
-                        onFavoriteToggle = onFavoriteToggle,
-                        onAddToPlaylist = onAddToPlaylist,
-                        onSelectionToggle = {
-                            selectedIds = if (song.id in selectedIds) selectedIds - song.id else selectedIds + song.id
-                        },
-                        onLongPress = { selectedIds = selectedIds + song.id },
-                    )
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 160.dp),
+                    contentPadding = PaddingValues(start = 8.dp, end = 8.dp, top = 8.dp, bottom = listBottomPad),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    state = gridState,
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    items(songs, key = { it.id }) { song ->
+                        MusicGridItem(
+                            song = song,
+                            isFavorite = song.id in favoriteIds,
+                            isSelected = song.id in selectedIds,
+                            isSelectionMode = isSelectionMode,
+                            displayPrefs = displayPrefs,
+                            customPlaylists = customPlaylists,
+                            context = context,
+                            queue = songs,
+                            onFavoriteToggle = onFavoriteToggle,
+                            onAddToPlaylist = onAddToPlaylist,
+                            onSelectionToggle = {
+                                selectedIds = if (song.id in selectedIds) selectedIds - song.id else selectedIds + song.id
+                            },
+                            onLongPress = { selectedIds = selectedIds + song.id },
+                        )
+                    }
                 }
             }
         } else {
-            LazyColumn(
-                contentPadding = PaddingValues(bottom = listBottomPad),
+            val listState = rememberLazyListState()
+            FastScrollLazyColumn(
+                lazyListState = listState,
                 modifier = Modifier.fillMaxSize(),
+                popupContent = { index ->
+                    songs.getOrNull(index)?.title?.firstOrNull()?.uppercase() ?: ""
+                },
             ) {
-                items(songs, key = { it.id }) { song ->
-                    MusicListItem(
-                        song = song,
-                        isFavorite = song.id in favoriteIds,
-                        isSelected = song.id in selectedIds,
-                        isSelectionMode = isSelectionMode,
-                        displayPrefs = displayPrefs,
-                        customPlaylists = customPlaylists,
-                        context = context,
-                        queue = songs,
-                        onFavoriteToggle = onFavoriteToggle,
-                        onAddToPlaylist = onAddToPlaylist,
-                        onSelectionToggle = {
-                            selectedIds = if (song.id in selectedIds) selectedIds - song.id else selectedIds + song.id
-                        },
-                        onLongPress = { selectedIds = selectedIds + song.id },
-                    )
+                LazyColumn(
+                    contentPadding = PaddingValues(bottom = listBottomPad),
+                    state = listState,
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    items(songs, key = { it.id }) { song ->
+                        MusicListItem(
+                            song = song,
+                            isFavorite = song.id in favoriteIds,
+                            isSelected = song.id in selectedIds,
+                            isSelectionMode = isSelectionMode,
+                            displayPrefs = displayPrefs,
+                            customPlaylists = customPlaylists,
+                            context = context,
+                            queue = songs,
+                            onFavoriteToggle = onFavoriteToggle,
+                            onAddToPlaylist = onAddToPlaylist,
+                            onSelectionToggle = {
+                                selectedIds = if (song.id in selectedIds) selectedIds - song.id else selectedIds + song.id
+                            },
+                            onLongPress = { selectedIds = selectedIds + song.id },
+                        )
+                    }
                 }
             }
         }

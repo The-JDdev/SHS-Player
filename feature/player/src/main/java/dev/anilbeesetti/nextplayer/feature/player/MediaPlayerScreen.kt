@@ -282,6 +282,9 @@ fun MediaPlayerScreen(
                         applyEmbeddedStyles = playerPreferences.applyEmbeddedStyles,
                     ),
                     isMirrored = isMirrored,
+                    eqBrightness = eqBrightness,
+                    eqContrast = eqContrast,
+                    eqSaturation = eqSaturation,
                 )
 
                 if (mediaPresentationState.isBuffering) {
