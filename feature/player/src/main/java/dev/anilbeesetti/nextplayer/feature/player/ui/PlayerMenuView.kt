@@ -25,6 +25,7 @@ fun PlayerMenuView(
     modifier: Modifier = Modifier,
     isMirrored: Boolean,
     isFavorite: Boolean,
+    audioDelayMs: Long = 0L,
     onMirrorClick: () -> Unit,
     onAbRepeatClick: () -> Unit,
     onDecoderClick: () -> Unit,
@@ -36,6 +37,8 @@ fun PlayerMenuView(
     onShareClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     onPlaylistClick: () -> Unit,
+    onSubtitleClick: () -> Unit = {},
+    onAudioDelayClick: () -> Unit = {},
     onVideoToAudioClick: () -> Unit = {},
     onReversePlayClick: () -> Unit = {},
 ) {
@@ -43,6 +46,18 @@ fun PlayerMenuView(
         modifier = modifier
             .padding(bottom = 24.dp),
     ) {
+        // ── Subtitles — single consolidated button ──────────────────────────
+        MenuItem(
+            icon = coreUiR.drawable.ic_subtitle_track,
+            title = stringResource(coreUiR.string.select_subtitle_track),
+            onClick = onSubtitleClick,
+        )
+        MenuItem(
+            icon = coreUiR.drawable.ic_audio_track,
+            title = if (audioDelayMs == 0L) "Audio Sync / Delay"
+                    else "Audio Sync (${if (audioDelayMs > 0) "+" else ""}${audioDelayMs} ms)",
+            onClick = onAudioDelayClick,
+        )
         MenuItem(
             icon = coreUiR.drawable.ic_mirror,
             title = if (isMirrored) stringResource(coreUiR.string.mirror_on) else stringResource(coreUiR.string.mirror_mode),
