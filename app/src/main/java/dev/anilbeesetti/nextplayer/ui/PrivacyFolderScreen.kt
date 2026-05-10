@@ -149,25 +149,58 @@ fun restoreFromVault(context: Context, vaultFile: VaultFile) {
     runCatching {
         val srcFile = File(vaultFile.vaultPath)
         if (!srcFile.exists()) return
-        val type = if (vaultFile.type == "video") "video/mp4" else "audio/mpeg"
-        val mimeBase = if (vaultFile.type == "video") MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-        else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        val values = android.content.ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, vaultFile.name)
-            put(MediaStore.MediaColumns.MIME_TYPE, type)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+
+        // Detect MIME from extension for correct gallery categorisation
+        val ext = vaultFile.name.substringAfterLast('.', "").lowercase()
+        val mimeType = android.webkit.MimeTypeMap.getSingleton()
+            .getMimeTypeFromExtension(ext)
+            ?: if (vaultFile.type == "video") "video/mp4" else "audio/mpeg"
+
+        val mimeBase = if (vaultFile.type == "video")
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+        else
+            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // API 29+: use IS_PENDING + RELATIVE_PATH so the file shows in gallery immediately
+            val relPath = if (vaultFile.type == "video")
+                android.os.Environment.DIRECTORY_MOVIES
+            else
+                android.os.Environment.DIRECTORY_MUSIC
+
+            val values = android.content.ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, vaultFile.name)
+                put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
+                put(MediaStore.MediaColumns.RELATIVE_PATH, relPath)
                 put(MediaStore.MediaColumns.IS_PENDING, 1)
             }
+            val uri = context.contentResolver.insert(mimeBase, values) ?: return
+            context.contentResolver.openOutputStream(uri)?.use { out ->
+                srcFile.inputStream().use { input -> input.copyTo(out) }
+            }
+            // Clear IS_PENDING so the file becomes visible in gallery
+            val updateValues = android.content.ContentValues().apply {
+                put(MediaStore.MediaColumns.IS_PENDING, 0)
+            }
+            context.contentResolver.update(uri, updateValues, null, null)
+        } else {
+            // Pre-Q: write to public directory + trigger MediaScanner explicitly
+            val dir = if (vaultFile.type == "video")
+                android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_MOVIES)
+            else
+                android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_MUSIC)
+            dir.mkdirs()
+            val destFile = File(dir, vaultFile.name)
+            srcFile.copyTo(destFile, overwrite = true)
+
+            // URGENT FIX: force MediaScanner so gallery picks up the file immediately
+            android.media.MediaScannerConnection.scanFile(
+                context,
+                arrayOf(destFile.absolutePath),
+                arrayOf(mimeType),
+            ) { _, _ -> /* scan complete */ }
         }
-        val uri = context.contentResolver.insert(mimeBase, values) ?: return
-        context.contentResolver.openOutputStream(uri)?.use { out ->
-            srcFile.inputStream().use { input -> input.copyTo(out) }
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            values.clear()
-            values.put(MediaStore.MediaColumns.IS_PENDING, 0)
-            context.contentResolver.update(uri, values, null, null)
-        }
+
         srcFile.delete()
         val remaining = getVaultFiles(context, vaultFile.type).filter { it.id != vaultFile.id }
         saveVaultFileMeta(context, vaultFile.type, remaining)
