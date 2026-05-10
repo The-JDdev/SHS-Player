@@ -33,6 +33,7 @@ room = "2.8.4"
 nextlib = "1.9.0-0.10.0"
 universalChardet = "2.5.0"
 biometric = "1.1.0"
+nanohttpd = "2.3.1"
 zxing = "3.5.3"
 camerax = "1.4.1"
 mlkit-barcode = "17.3.0"
@@ -96,6 +97,7 @@ androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", 
 androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
 androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
 mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "mlkit-barcode" }
+nanohttpd = { group = "org.nanohttpd", name = "nanohttpd", version.ref = "nanohttpd" }
 
 [plugins]
 aboutLibraries = { id = "com.mikepenz.aboutlibraries.plugin.android", version.ref = "aboutlibraries" }
