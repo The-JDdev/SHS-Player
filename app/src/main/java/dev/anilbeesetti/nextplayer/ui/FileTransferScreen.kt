@@ -378,9 +378,11 @@ fun SendView(context: Context) {
     var progressBytes by remember { mutableLongStateOf(0L) }
     var progressTotal by remember { mutableLongStateOf(0L) }
 
+    // Request Camera + Location/Nearby Devices simultaneously
     val requiredPermissions = buildList {
         add(Manifest.permission.CAMERA)
         add(Manifest.permission.ACCESS_FINE_LOCATION)
+        add(Manifest.permission.ACCESS_COARSE_LOCATION)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             add(Manifest.permission.BLUETOOTH_CONNECT)
             add(Manifest.permission.BLUETOOTH_SCAN)
@@ -593,8 +595,12 @@ fun ReceiveView(context: Context) {
     var server by remember { mutableStateOf<VaultHttpServer?>(null) }
     var showPermDialog by remember { mutableStateOf(false) }
 
+    // Request Camera + Location/Nearby Devices simultaneously
+    // Camera is needed in case the receiver also wants to scan QR codes
     val requiredPermissions = buildList {
+        add(Manifest.permission.CAMERA)
         add(Manifest.permission.ACCESS_FINE_LOCATION)
+        add(Manifest.permission.ACCESS_COARSE_LOCATION)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             add(Manifest.permission.BLUETOOTH_CONNECT)
             add(Manifest.permission.BLUETOOTH_SCAN)
