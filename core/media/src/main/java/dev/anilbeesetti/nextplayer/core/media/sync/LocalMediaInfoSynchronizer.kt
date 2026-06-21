@@ -16,10 +16,6 @@ import dev.anilbeesetti.nextplayer.core.database.dao.MediumDao
 import dev.anilbeesetti.nextplayer.core.database.entities.AudioStreamInfoEntity
 import dev.anilbeesetti.nextplayer.core.database.entities.SubtitleStreamInfoEntity
 import dev.anilbeesetti.nextplayer.core.database.entities.VideoStreamInfoEntity
-import io.github.anilbeesetti.nextlib.mediainfo.AudioStream
-import io.github.anilbeesetti.nextlib.mediainfo.MediaInfoBuilder
-import io.github.anilbeesetti.nextlib.mediainfo.SubtitleStream
-import io.github.anilbeesetti.nextlib.mediainfo.VideoStream
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
@@ -82,43 +78,85 @@ class LocalMediaInfoSynchronizer @Inject constructor(
             MediaMetadataRetriever().apply { setDataSource(context, uri) }
         }.getOrNull()
 
-        val mediaInfo = runCatching {
-            MediaInfoBuilder().from(context = context, uri = uri).build() ?: throw NullPointerException()
-        }.onFailure { e ->
-            e.printStackTrace()
-            Log.d(TAG, "sync: MediaInfoBuilder exception", e)
-        }.getOrNull()
+        if (mediaMetadataRetriever == null) {
+            Log.d(TAG, "performSync: MediaMetadataRetriever is null for $uri")
+            return
+        }
 
         val thumbnail = runCatching {
-            listOf(
-                ".jpg",
-                ".jpeg",
-                ".png",
-            ).firstOrNull { imageExtension ->
+            listOf(".jpg", ".jpeg", ".png").firstOrNull { imageExtension ->
                 File(medium.mediumEntity.path.substringBeforeLast(".") + ".$imageExtension").exists()
             }?.let {
                 BitmapFactory.decodeFile(medium.mediumEntity.path.substringBeforeLast(".") + ".$it")
             }
         }.getOrNull()
-            ?: runCatching { mediaMetadataRetriever?.embeddedPicture?.toBitmap() }.getOrNull()
+            ?: runCatching { mediaMetadataRetriever.embeddedPicture?.toBitmap() }.getOrNull()
             ?: runCatching {
-                val videoDuration = mediaInfo?.duration
-                    ?: mediaMetadataRetriever?.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull()
+                val videoDuration = mediaMetadataRetriever
+                    .extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull()
                     ?: return@runCatching null
-                mediaMetadataRetriever?.getFrameAtTime((videoDuration * 1000) / 3)
+                mediaMetadataRetriever.getFrameAtTime((videoDuration * 1000) / 3)
             }.getOrNull()
-            ?: runCatching { mediaMetadataRetriever?.getFrameAtTime(0) }.getOrNull()
-            ?: runCatching { mediaInfo?.getFrame() }.getOrNull()
-        mediaMetadataRetriever?.release()
-        mediaInfo?.release() ?: return
+            ?: runCatching { mediaMetadataRetriever.getFrameAtTime(0) }.getOrNull()
 
-        val videoStreamInfo = mediaInfo.videoStream?.toVideoStreamInfoEntity(medium.mediumEntity.uriString)
-        val audioStreamsInfo = mediaInfo.audioStreams.map {
-            it.toAudioStreamInfoEntity(medium.mediumEntity.uriString)
-        }
-        val subtitleStreamsInfo = mediaInfo.subtitleStreams.map {
-            it.toSubtitleStreamInfoEntity(medium.mediumEntity.uriString)
-        }
+        // Extract basic metadata via MediaMetadataRetriever (replaces nextlib-mediainfo)
+        val format = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
+        val durationMs = mediaMetadataRetriever
+            .extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull()
+        val width = mediaMetadataRetriever
+            .extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toIntOrNull()
+        val height = mediaMetadataRetriever
+            .extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toIntOrNull()
+        val bitrate = mediaMetadataRetriever
+            .extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)?.toLongOrNull()
+        val rotation = mediaMetadataRetriever
+            .extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)?.toIntOrNull() ?: 0
+
+        val videoStreamInfo = if (width != null && height != null) {
+            VideoStreamInfoEntity(
+                index = 0,
+                title = null,
+                codecName = mediaMetadataRetriever
+                    .extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE),
+                language = null,
+                disposition = null,
+                bitRate = bitrate,
+                frameRate = null,
+                frameWidth = width,
+                frameHeight = height,
+                mediumUri = medium.mediumEntity.uriString,
+            )
+        } else null
+
+        val audioStreamsInfo = listOfNotNull(
+            runCatching {
+                val sampleRate = mediaMetadataRetriever
+                    .extractMetadata(MediaMetadataRetriever.METADATA_KEY_SAMPLERATE)?.toIntOrNull()
+                val channels = mediaMetadataRetriever
+                    .extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS)?.toIntOrNull()
+                val audioBitrate = mediaMetadataRetriever
+                    .extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)?.toLongOrNull()
+                AudioStreamInfoEntity(
+                    index = 1,
+                    title = null,
+                    codecName = mediaMetadataRetriever
+                        .extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE),
+                    language = null,
+                    disposition = null,
+                    bitRate = audioBitrate,
+                    sampleFormat = null,
+                    sampleRate = sampleRate,
+                    channels = channels,
+                    channelLayout = null,
+                    mediumUri = medium.mediumEntity.uriString,
+                )
+            }.getOrNull(),
+        )
+
+        val subtitleStreamsInfo = emptyList<SubtitleStreamInfoEntity>()
+
+        mediaMetadataRetriever.release()
+
         val thumbnailPath = thumbnail?.saveTo(
             storageDir = context.thumbnailCacheDir,
             quality = 40,
@@ -127,7 +165,7 @@ class LocalMediaInfoSynchronizer @Inject constructor(
 
         mediumDao.upsert(
             medium.mediumEntity.copy(
-                format = mediaInfo.format,
+                format = format,
                 thumbnailPath = thumbnailPath,
             ),
         )
@@ -140,42 +178,6 @@ class LocalMediaInfoSynchronizer @Inject constructor(
         private const val TAG = "MediaInfoSynchronizer"
     }
 }
-
-private fun VideoStream.toVideoStreamInfoEntity(mediumUri: String) = VideoStreamInfoEntity(
-    index = index,
-    title = title,
-    codecName = codecName,
-    language = language,
-    disposition = disposition,
-    bitRate = bitRate,
-    frameRate = frameRate,
-    frameWidth = frameWidth,
-    frameHeight = frameHeight,
-    mediumUri = mediumUri,
-)
-
-private fun AudioStream.toAudioStreamInfoEntity(mediumUri: String) = AudioStreamInfoEntity(
-    index = index,
-    title = title,
-    codecName = codecName,
-    language = language,
-    disposition = disposition,
-    bitRate = bitRate,
-    sampleFormat = sampleFormat,
-    sampleRate = sampleRate,
-    channels = channels,
-    channelLayout = channelLayout,
-    mediumUri = mediumUri,
-)
-
-private fun SubtitleStream.toSubtitleStreamInfoEntity(mediumUri: String) = SubtitleStreamInfoEntity(
-    index = index,
-    title = title,
-    codecName = codecName,
-    language = language,
-    disposition = disposition,
-    mediumUri = mediumUri,
-)
 
 suspend fun Bitmap.saveTo(
     storageDir: File,

@@ -30,8 +30,8 @@ kotlinxSerializationJson = "1.10.0"
 ksp = "2.3.4"
 ktlint = "12.3.0"
 room = "2.8.4"
-nextlib = "1.9.0-0.10.0"
 universalChardet = "2.5.0"
+libvlc = "3.6.0-eap5"
 biometric = "1.1.0"
 nanohttpd = "2.3.1"
 zxing = "3.5.3"
@@ -79,8 +79,7 @@ androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espres
 androidx-test-ext = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "androidxTestExt" }
 coil-kt-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 github-albfernandez-juniversalchardet = { group="com.github.albfernandez", name = "juniversalchardet", version.ref="universalChardet" }
-github-anilbeesetti-nextlib-media3ext = { group = "io.github.anilbeesetti", name = "nextlib-media3ext", version.ref = "nextlib" }
-github-anilbeesetti-nextlib-mediainfo = { group = "io.github.anilbeesetti", name = "nextlib-mediainfo", version.ref = "nextlib" }
+libvlc-android = { group = "org.videolan.android", name = "libvlc-all", version.ref = "libvlc" }
 google-android-material = { group = "com.google.android.material", name = "material", version.ref = "androidMaterial" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }

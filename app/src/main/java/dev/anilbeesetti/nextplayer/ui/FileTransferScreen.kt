@@ -404,8 +404,35 @@ fun SendView(context: Context) {
 
     if (showQrScanner) {
         QrScannerDialog(
-            onResult = { scannedUrl ->
-                targetUrl = scannedUrl
+            onResult = { scannedContent ->
+                // Phase 4: Parse the scanned QR using the TrebleShot-compatible
+                // format (hs;pin;ssid;bssid;password;end or wf;pin;ssid;bssid;ip;end).
+                // If the scan is a plain URL (legacy VaultHttpServer format),
+                // fall back to using it as the target URL directly.
+                val parsed = dev.anilbeesetti.nextplayer.ui.share.QrShareFormat.parse(scannedContent)
+                if (parsed != null) {
+                    when (parsed) {
+                        is dev.anilbeesetti.nextplayer.ui.share.QrShareFormat.ParsedQr.Wifi -> {
+                            // Same LAN — connect directly to the embedded IP
+                            targetUrl = "http://${parsed.hostIp}:8080"
+                        }
+                        is dev.anilbeesetti.nextplayer.ui.share.QrShareFormat.ParsedQr.Hotspot -> {
+                            // Different network — user must manually join the hotspot SSID,
+                            // then re-scan. For now, prompt them to open Wi-Fi settings.
+                            android.widget.Toast.makeText(
+                                context,
+                                "Join Wi-Fi \"${parsed.ssid}\" then scan again",
+                                android.widget.Toast.LENGTH_LONG,
+                            ).show()
+                            val intent = android.content.Intent(android.provider.Settings.ACTION_WIFI_SETTINGS)
+                            intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                            context.startActivity(intent)
+                        }
+                    }
+                } else {
+                    // Plain URL fallback (legacy format) — keep old behaviour
+                    targetUrl = scannedContent
+                }
                 showQrScanner = false
             },
             onDismiss = { showQrScanner = false },

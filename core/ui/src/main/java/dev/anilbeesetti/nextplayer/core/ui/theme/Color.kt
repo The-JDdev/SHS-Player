@@ -229,3 +229,47 @@ val surfaceContainerHighPureBlack = Color(0xFF1A1A1A)
 val surfaceContainerHighestPureBlack = Color(0xFF222222)
 
 val seed = Color(0xFF2B4241)
+
+// ── Phase 5: Premium Material 3 + Cupertino (iOS) hybrid palette ──────────────
+// Inspired by iOS 17 system colors (SF Blue, SF Pink) blended with Material 3
+// tonal surfaces. Used when the user enables "Premium (M3 + Cupertino)" theme
+// in Settings → Appearance.
+
+// iOS-blue inspired primary (light)
+val primaryCupertinoLight = Color(0xFF007AFF)
+val onPrimaryCupertinoLight = Color(0xFFFFFFFF)
+val primaryContainerCupertinoLight = Color(0xFFD6E9FF)
+val onPrimaryContainerCupertinoLight = Color(0xFF003E80)
+
+// iOS-pink inspired tertiary accent (light)
+val tertiaryCupertinoLight = Color(0xFFFF2D55)
+val onTertiaryCupertinoLight = Color(0xFFFFFFFF)
+val tertiaryContainerCupertinoLight = Color(0xFFFFD9E0)
+val onTertiaryContainerCupertinoLight = Color(0xFF8E001F)
+
+// iOS-gray surfaces (light)
+val backgroundCupertinoLight = Color(0xFFF2F2F7)   // iOS systemGroupedBackground
+val onBackgroundCupertinoLight = Color(0xFF1C1C1E) // iOS label
+val surfaceCupertinoLight = Color(0xFFFFFFFF)      // iOS secondarySystemGroupedBackground
+val onSurfaceCupertinoLight = Color(0xFF1C1C1E)
+val surfaceVariantCupertinoLight = Color(0xFFE5E5EA)
+val onSurfaceVariantCupertinoLight = Color(0xFF636366)
+
+// Cupertino dark
+val primaryCupertinoDark = Color(0xFF0A84FF)
+val onPrimaryCupertinoDark = Color(0xFF002A55)
+val primaryContainerCupertinoDark = Color(0xFF003E80)
+val onPrimaryContainerCupertinoDark = Color(0xFFD6E9FF)
+
+val tertiaryCupertinoDark = Color(0xFFFF375F)
+val onTertiaryCupertinoDark = Color(0xFF6B001A)
+val tertiaryContainerCupertinoDark = Color(0xFF8E001F)
+val onTertiaryContainerCupertinoDark = Color(0xFFFFD9E0)
+
+val backgroundCupertinoDark = Color(0xFF000000)        // iOS pure black OLED
+val onBackgroundCupertinoDark = Color(0xFFFFFFFF)
+val surfaceCupertinoDark = Color(0xFF1C1C1E)           // iOS secondarySystemBackground
+val onSurfaceCupertinoDark = Color(0xFFFFFFFF)
+val surfaceVariantCupertinoDark = Color(0xFF2C2C2E)
+val onSurfaceVariantCupertinoDark = Color(0xFFAEAEB2)
+

@@ -33,7 +33,6 @@ dependencies {
     implementation(project(":core:database"))
 
     implementation(libs.androidx.core.ktx)
-    implementation(libs.github.anilbeesetti.nextlib.mediainfo)
 
     // Hilt
     implementation(libs.hilt.android)
