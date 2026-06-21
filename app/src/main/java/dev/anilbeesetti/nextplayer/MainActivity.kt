@@ -28,6 +28,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import dev.anilbeesetti.nextplayer.ui.splash.AnimatedSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -111,6 +112,17 @@ class MainActivity : ComponentActivity() {
                 highContrastDarkTheme = shouldUseHighContrastDarkTheme(uiState = uiState),
                 dynamicColor = shouldUseDynamicTheming(uiState = uiState),
             ) {
+                // Phase 5: Show animated splash screen while the app is loading.
+                // This replaces the previous plain "shs player" text splash with
+                // an animated logo + gradient + breathing pulse effect.
+                if (uiState is MainActivityUiState.Loading) {
+                    AnimatedSplashScreen(
+                        appName = "SHS Player",
+                        tagline = "Premium Media Experience",
+                    )
+                    return@NextPlayerTheme
+                }
+
                 val storagePermissionState = rememberPermissionState(permission = storagePermission)
 
                 LifecycleEventEffect(event = Lifecycle.Event.ON_START) {

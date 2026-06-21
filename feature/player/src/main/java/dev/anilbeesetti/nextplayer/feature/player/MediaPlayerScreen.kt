@@ -80,6 +80,7 @@ import dev.anilbeesetti.nextplayer.feature.player.state.rememberSeekGestureState
 import dev.anilbeesetti.nextplayer.feature.player.state.rememberTapGestureState
 import dev.anilbeesetti.nextplayer.feature.player.state.rememberVideoZoomAndContentScaleState
 import dev.anilbeesetti.nextplayer.feature.player.state.rememberAudioEqualizerState
+import dev.anilbeesetti.nextplayer.feature.player.state.rememberVideoEqualizerState
 import dev.anilbeesetti.nextplayer.feature.player.state.rememberVolumeAndBrightnessGestureState
 import dev.anilbeesetti.nextplayer.feature.player.state.rememberVolumeState
 import dev.anilbeesetti.nextplayer.feature.player.state.seekAmountFormatted
@@ -169,6 +170,10 @@ fun MediaPlayerScreen(
     var abPointA by remember { mutableStateOf<Long?>(null) }
     var abPointB by remember { mutableStateOf<Long?>(null) }
     var voiceEffect by remember { mutableStateOf(VoiceEffect.NORMAL) }
+    // Phase 3: Video equalizer state — wired to ExoPlayer RgbAdjustment effect
+    // (contrast/saturation) + window screenBrightness (brightness).
+    // Mirrors mpv-android MPVActivity.kt:1523 design (mpv -100..+100 → Media3 0..2 multipliers).
+    val videoEqState = rememberVideoEqualizerState(player, context as? android.app.Activity)
     var eqBrightness by remember { mutableFloatStateOf(1f) }
     var eqContrast by remember { mutableFloatStateOf(1f) }
     var eqSaturation by remember { mutableFloatStateOf(1f) }
@@ -512,11 +517,26 @@ fun MediaPlayerScreen(
                     viewModel.cancelSleepTimer()
                     Toast.makeText(context, "Sleep timer cancelled", Toast.LENGTH_SHORT).show()
                 },
-                onEqBrightnessChange = { eqBrightness = it },
-                onEqContrastChange = { eqContrast = it },
-                onEqSaturationChange = { eqSaturation = it },
-                onEqReset = { eqBrightness = 1f; eqContrast = 1f; eqSaturation = 1f },
-                onEqApplyProfile = { b, c, s -> eqBrightness = b; eqContrast = c; eqSaturation = s },
+                onEqBrightnessChange = {
+                    eqBrightness = it
+                    videoEqState.setBrightnessFromMultiplier(it)
+                },
+                onEqContrastChange = {
+                    eqContrast = it
+                    videoEqState.setContrastFromMultiplier(it)
+                },
+                onEqSaturationChange = {
+                    eqSaturation = it
+                    videoEqState.setSaturationFromMultiplier(it)
+                },
+                onEqReset = {
+                    eqBrightness = 1f; eqContrast = 1f; eqSaturation = 1f
+                    videoEqState.reset()
+                },
+                onEqApplyProfile = { b, c, s ->
+                    eqBrightness = b; eqContrast = c; eqSaturation = s
+                    videoEqState.applyProfile(b, c, s)
+                },
                 onAddBookmark = {
                     viewModel.addBookmark(player.currentPosition)
                     Toast.makeText(context, coreUiR.string.bookmark_added, Toast.LENGTH_SHORT).show()

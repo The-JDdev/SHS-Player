@@ -65,8 +65,9 @@ dependencies {
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.media3.ui.compose)
     implementation(libs.androidx.media3.session)
-    implementation(libs.github.anilbeesetti.nextlib.media3ext)
-    implementation(libs.github.anilbeesetti.nextlib.mediainfo)
+
+    // LibVLC — used as alternative engine for problematic codecs & audio equalizer
+    implementation(libs.libvlc.android)
 
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.guava)

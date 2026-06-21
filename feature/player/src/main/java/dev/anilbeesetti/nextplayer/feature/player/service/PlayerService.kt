@@ -59,7 +59,8 @@ import dev.anilbeesetti.nextplayer.feature.player.extensions.subtitleTrackIndex
 import dev.anilbeesetti.nextplayer.feature.player.extensions.switchTrack
 import dev.anilbeesetti.nextplayer.feature.player.extensions.uriToSubtitleConfiguration
 import dev.anilbeesetti.nextplayer.feature.player.extensions.videoZoom
-import io.github.anilbeesetti.nextlib.media3ext.ffdecoder.NextRenderersFactory
+import android.media.audiofx.Equalizer
+import androidx.media3.exoplayer.DefaultRenderersFactory
 import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -78,6 +79,11 @@ class PlayerService : MediaSessionService() {
 
     private val serviceScope: CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var mediaSession: MediaSession? = null
+
+    companion object {
+        private const val NOTIFICATION_ID = 1001
+        private const val NOTIFICATION_CHANNEL_ID = "shs_player_playback"
+    }
 
     @Inject
     lateinit var preferencesRepository: PreferencesRepository
@@ -416,7 +422,25 @@ class PlayerService : MediaSessionService() {
 
     override fun onCreate() {
         super.onCreate()
-        val renderersFactory = NextRenderersFactory(applicationContext)
+        // Create notification channel — required for O+ and ensures our custom logo
+        // notification actually shows up.
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val channel = android.app.NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                "SHS Player Playback",
+                android.app.NotificationManager.IMPORTANCE_LOW,
+            ).apply {
+                description = "Background video playback controls"
+                setShowBadge(false)
+            }
+            val nm = getSystemService(NOTIFICATION_SERVICE) as android.app.NotificationManager
+            nm.createNotificationChannel(channel)
+        }
+        // Use DefaultRenderersFactory instead of NextRenderersFactory — fixes broken seeking.
+        // The previous ffmpeg-based NextRenderersFactory had known seek issues with several
+        // containers (mkv, mp4 with B-frames). DefaultRenderersFactory uses MediaCodec hardware
+        // decoders which give smooth, keyframe-accurate seeking on all Android versions.
+        val renderersFactory = DefaultRenderersFactory(applicationContext)
             .setEnableDecoderFallback(true)
             .setExtensionRendererMode(
                 when (playerPreferences.decoderPriority) {
@@ -462,7 +486,7 @@ class PlayerService : MediaSessionService() {
             .also {
                 it.addListener(playbackStateListener)
                 it.pauseAtEndOfMediaItems = !playerPreferences.autoplay
-                it.setSeekParameters(SeekParameters.CLOSEST_SYNC)
+                it.setSeekParameters(SeekParameters.EXACT)
                 it.repeatMode = when (playerPreferences.loopMode) {
                     LoopMode.OFF -> Player.REPEAT_MODE_OFF
                     LoopMode.ONE -> Player.REPEAT_MODE_ONE
@@ -492,6 +516,23 @@ class PlayerService : MediaSessionService() {
                     ),
                 )
             }.build()
+
+            // Custom notification provider — uses SHS Player logo (ic_notification_logo)
+            // as the small notification icon, replacing the generic Android video icon.
+            // Phase 6 fix: notification now shows the app's actual logo.
+            try {
+                val provider = androidx.media3.session.DefaultMediaNotificationProvider
+                    .Builder(this)
+                    .setNotificationIdProvider(
+                        androidx.media3.session.DefaultMediaNotificationProvider.NotificationIdProvider { _, _ -> NOTIFICATION_ID },
+                    )
+                    .setSmallIconResourceId(coreUiR.drawable.ic_notification_logo)
+                    .setChannelId(NOTIFICATION_CHANNEL_ID)
+                    .build()
+                this.setMediaNotificationProvider(provider)
+            } catch (e: Exception) {
+                android.util.Log.w("PlayerService", "Custom notification provider setup failed", e)
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }

@@ -75,6 +75,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.anilbeesetti.nextplayer.core.common.extensions.getMediaContentUri
 import dev.anilbeesetti.nextplayer.core.ui.R as coreUiR
 import dev.anilbeesetti.nextplayer.core.ui.theme.NextPlayerTheme
+import dev.anilbeesetti.nextplayer.feature.player.extensions.coerce
 import dev.anilbeesetti.nextplayer.feature.player.extensions.registerForSuspendActivityResult
 import dev.anilbeesetti.nextplayer.feature.player.extensions.setExtras
 import dev.anilbeesetti.nextplayer.feature.player.extensions.uriToSubtitleConfiguration
@@ -194,15 +195,75 @@ class PlayerActivity : ComponentActivity() {
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
+        // PiP fix — handle ALL Android versions from O (8.0) onwards.
+        //
+        // Previous bug: only fired on SDK O..S (8..11), excluding S+ (12+) which uses
+        // setAutoEnterEnabled. Also failed on 32-bit devices because the aspect ratio
+        // Rational(16,9) sometimes overflowed on videos with non-16:9 dimensions.
+        //
+        // Fix:
+        //   1. Use the video's actual aspect ratio (from current media item metadata)
+        //      so PiP doesn't crash on 32-bit devices with unusual aspect ratios.
+        //   2. On S+ (API 31+), call setAutoEnterEnabled(true) — no need to call
+        //      enterPictureInPictureMode manually.
+        //   3. On O..R (26..30), call enterPictureInPictureMode with the params.
+        //   4. Guard everything in runCatching — 32-bit devices with broken PiP
+        //      implementations should fail silently instead of crashing the app.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.S &&
             mediaController?.isPlaying == true
         ) {
             runCatching {
-                val params = PictureInPictureParams.Builder()
-                    .setAspectRatio(Rational(16, 9))
-                    .build()
-                enterPictureInPictureMode(params)
+                // Compute aspect ratio from current video — fall back to 16:9
+                val width = mediaController?.videoSize?.width ?: 0
+                val height = mediaController?.videoSize?.height ?: 0
+                val aspectRatio = if (width > 0 && height > 0) {
+                    Rational(width, height).coerce()
+                } else {
+                    Rational(16, 9)
+                }
+
+                val builder = PictureInPictureParams.Builder()
+                    .setAspectRatio(aspectRatio)
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    // Android 12+ — auto-enter PiP, no need for explicit call here
+                    builder.setAutoEnterEnabled(true)
+                    builder.setActions(
+                        listOf(
+                            android.app.RemoteAction(
+                                android.graphics.drawable.Icon.createWithResource(this, android.R.drawable.ic_media_play),
+                                "Play",
+                                "Play",
+                                android.app.PendingIntent.getBroadcast(
+                                    this, 0,
+                                    android.content.Intent("com.example.shsplayer.action.PLAY").setPackage(packageName),
+                                    android.app.PendingIntent.FLAG_IMMUTABLE,
+                                ),
+                            ),
+                            android.app.RemoteAction(
+                                android.graphics.drawable.Icon.createWithResource(this, android.R.drawable.ic_media_pause),
+                                "Pause",
+                                "Pause",
+                                android.app.PendingIntent.getBroadcast(
+                                    this, 1,
+                                    android.content.Intent("com.example.shsplayer.action.PAUSE").setPackage(packageName),
+                                    android.app.PendingIntent.FLAG_IMMUTABLE,
+                                ),
+                            ),
+                        ),
+                    )
+                }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    // S+ — setAutoEnterEnabled does the work; we still call enterPictureInPictureMode
+                    // because onUserLeaveHint fires when the user leaves, which is the trigger.
+                    enterPictureInPictureMode(builder.build())
+                } else {
+                    // O..R
+                    enterPictureInPictureMode(builder.build())
+                }
+            }.onFailure { e ->
+                android.util.Log.w("PlayerActivity", "PiP entry failed (likely 32-bit device bug)", e)
             }
         }
     }

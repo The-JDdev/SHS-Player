@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SHS Player — Notification Logo (Vector Drawable)
+  ================================================
+  Converted from app/src/main/res/drawable/ic_launcher_foreground.png
+  via bitmap-to-vector abstraction. The original logo is a square frame
+  containing the "SHS" wordmark; this vector preserves that silhouette.
+
+  Used as the small icon for the background-playback Media3 notification
+  (replaces the default Android video icon).
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Outer frame -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M16,16 L92,16 L92,20 L20,20 L20,88 L16,88 Z" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M88,16 L92,16 L92,92 L16,92 L16,88 L88,88 Z" />
+
+    <!-- Play triangle inside frame (replaces literal "SHS" text for visibility at 24dp) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M44,38 L44,70 L72,54 Z" />
+
+</vector>
