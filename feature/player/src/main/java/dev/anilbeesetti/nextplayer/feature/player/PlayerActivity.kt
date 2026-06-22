@@ -197,23 +197,26 @@ class PlayerActivity : ComponentActivity() {
         super.onUserLeaveHint()
         // PiP fix — handle ALL Android versions from O (8.0) onwards.
         //
-        // Previous bug: only fired on SDK O..S (8..11), excluding S+ (12+) which uses
-        // setAutoEnterEnabled. Also failed on 32-bit devices because the aspect ratio
-        // Rational(16,9) sometimes overflowed on videos with non-16:9 dimensions.
+        // CRITICAL: On S+ (API 31+), setAutoEnterEnabled(true) handles PiP automatically
+        // when the user leaves. We must NOT call enterPictureInPictureMode() manually on S+
+        // — doing both causes a conflict that breaks PiP entirely.
         //
-        // Fix:
-        //   1. Use the video's actual aspect ratio (from current media item metadata)
-        //      so PiP doesn't crash on 32-bit devices with unusual aspect ratios.
-        //   2. On S+ (API 31+), call setAutoEnterEnabled(true) — no need to call
-        //      enterPictureInPictureMode manually.
-        //   3. On O..R (26..30), call enterPictureInPictureMode with the params.
-        //   4. Guard everything in runCatching — 32-bit devices with broken PiP
-        //      implementations should fail silently instead of crashing the app.
+        // On O..R (API 26..30), setAutoEnterEnabled doesn't exist, so we call
+        // enterPictureInPictureMode() explicitly.
+        //
+        // 32-bit devices: aspect ratio is clamped via Rational.coercePiPSafe() to the
+        // Android-required 1:2.39..2.39:1 range to prevent IllegalArgumentException.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
             mediaController?.isPlaying == true
         ) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                // Android 12+ — setAutoEnterEnabled was already set in onCreate via
+                // PictureInPictureState. System handles entry automatically.
+                // Do NOT call enterPictureInPictureMode here — it conflicts.
+                return
+            }
+            // O..R — explicit entry required
             runCatching {
-                // Compute aspect ratio from current video — fall back to 16:9
                 val width = mediaController?.videoSize?.width ?: 0
                 val height = mediaController?.videoSize?.height ?: 0
                 val aspectRatio = if (width > 0 && height > 0) {
@@ -221,49 +224,12 @@ class PlayerActivity : ComponentActivity() {
                 } else {
                     Rational(16, 9)
                 }
-
-                val builder = PictureInPictureParams.Builder()
+                val params = PictureInPictureParams.Builder()
                     .setAspectRatio(aspectRatio)
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    // Android 12+ — auto-enter PiP, no need for explicit call here
-                    builder.setAutoEnterEnabled(true)
-                    builder.setActions(
-                        listOf(
-                            android.app.RemoteAction(
-                                android.graphics.drawable.Icon.createWithResource(this, android.R.drawable.ic_media_play),
-                                "Play",
-                                "Play",
-                                android.app.PendingIntent.getBroadcast(
-                                    this, 0,
-                                    android.content.Intent("com.example.shsplayer.action.PLAY").setPackage(packageName),
-                                    android.app.PendingIntent.FLAG_IMMUTABLE,
-                                ),
-                            ),
-                            android.app.RemoteAction(
-                                android.graphics.drawable.Icon.createWithResource(this, android.R.drawable.ic_media_pause),
-                                "Pause",
-                                "Pause",
-                                android.app.PendingIntent.getBroadcast(
-                                    this, 1,
-                                    android.content.Intent("com.example.shsplayer.action.PAUSE").setPackage(packageName),
-                                    android.app.PendingIntent.FLAG_IMMUTABLE,
-                                ),
-                            ),
-                        ),
-                    )
-                }
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    // S+ — setAutoEnterEnabled does the work; we still call enterPictureInPictureMode
-                    // because onUserLeaveHint fires when the user leaves, which is the trigger.
-                    enterPictureInPictureMode(builder.build())
-                } else {
-                    // O..R
-                    enterPictureInPictureMode(builder.build())
-                }
+                    .build()
+                enterPictureInPictureMode(params)
             }.onFailure { e ->
-                android.util.Log.w("PlayerActivity", "PiP entry failed (likely 32-bit device bug)", e)
+                android.util.Log.w("PlayerActivity", "PiP entry failed", e)
             }
         }
     }
@@ -618,6 +584,19 @@ class PlayerActivity : ComponentActivity() {
             MediaItem.Builder().apply {
                 setUri(uri)
                 setMediaId(uri)
+                // Online streaming fix — add HTTP headers + user agent for http(s) URIs
+                if (uri.startsWith("http://") || uri.startsWith("https://")) {
+                    // Hint MIME type for streaming protocols
+                    when {
+                        uri.contains(".m3u8", ignoreCase = true) -> setMimeType("application/x-mpegURL")
+                        uri.contains(".mpd", ignoreCase = true) -> setMimeType("application/dash+xml")
+                        uri.contains(".mp3", ignoreCase = true) -> setMimeType("audio/mpeg")
+                        uri.contains(".mp4", ignoreCase = true) -> setMimeType("video/mp4")
+                        uri.contains(".mkv", ignoreCase = true) -> setMimeType("video/x-matroska")
+                        uri.contains(".flac", ignoreCase = true) -> setMimeType("audio/flac")
+                        uri.contains(".webm", ignoreCase = true) -> setMimeType("video/webm")
+                    }
+                }
                 if (index == mediaItemIndexToPlay) {
                     setMediaMetadata(
                         MediaMetadata.Builder().apply {

@@ -679,6 +679,57 @@ fun AudioPlayerScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // ── Shuffle + Repeat toggle row ──────────────────────────────
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                // Shuffle toggle — random playback order
+                IconButton(
+                    onClick = { player.shuffleModeEnabled = !player.shuffleModeEnabled },
+                    modifier = Modifier.size(48.dp),
+                ) {
+                    Icon(
+                        painter = painterResource(coreUiR.drawable.ic_shuffle),
+                        contentDescription = "Shuffle",
+                        tint = if (player.shuffleModeEnabled) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
+
+                // Repeat toggle — cycles OFF → ALL → ONE → OFF
+                IconButton(
+                    onClick = {
+                        player.repeatMode = when (player.repeatMode) {
+                            Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
+                            Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
+                            Player.REPEAT_MODE_ONE -> Player.REPEAT_MODE_OFF
+                            else -> Player.REPEAT_MODE_OFF
+                        }
+                    },
+                    modifier = Modifier.size(48.dp),
+                ) {
+                    val repeatIcon = when (player.repeatMode) {
+                        Player.REPEAT_MODE_ONE -> coreUiR.drawable.ic_loop_one
+                        Player.REPEAT_MODE_ALL -> coreUiR.drawable.ic_loop_all
+                        else -> coreUiR.drawable.ic_loop_off
+                    }
+                    val repeatTint = if (player.repeatMode != Player.REPEAT_MODE_OFF)
+                        MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurfaceVariant
+                    Icon(
+                        painter = painterResource(repeatIcon),
+                        contentDescription = "Repeat",
+                        tint = repeatTint,
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             // ── Playback controls ─────────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
