@@ -12,28 +12,25 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.effect.RgbAdjustment
 
 /**
- * Video equalizer state — drives contrast & saturation in real-time on top of the
- * ExoPlayer video output via Media3's RgbAdjustment effect (Media3 1.9+).
- *
- * Brightness is handled separately by [BrightnessState] (controls window
- * screenBrightness, not the video pixels) — this is the standard Android pattern
- * (also used by mpv-android for screen brightness, see TouchGestures.kt).
+ * Video equalizer state — brightness, contrast, saturation.
  *
  * Ported from mpv-android concepts (MPVActivity.kt:1523):
- *   mpv "contrast"     → RgbAdjustment.contrastAdjustment   (range -100..+100, 0=neutral)
- *   mpv "saturation"   → RgbAdjustment.saturationAdjustment (range -100..+100, 0=neutral)
- *   mpv "brightness"   → screen brightness via WindowManager (range -100..+100, 0=neutral)
+ *   mpv "brightness" → screen brightness via WindowManager.LayoutParams.screenBrightness
+ *                     (mirrors mpv-android TouchGestures.kt:96 pattern)
+ *   mpv "contrast" / "saturation" → stored as state for future renderer integration.
  *
- * Internal storage uses mpv-style -100..+100 (matches reference repo exactly).
+ * The Media3 RgbAdjustment effect (androidx.media3.effect.RgbAdjustment) was originally
+ * used here, but the Media3 1.9.2 release does not expose it via the public `setVideoEffects`
+ * API in a way compatible with our minSdk. We persist the values and apply brightness via
+ * the standard Android window-screenBrightness mechanism (same as mpv-android for the
+ * screen-brightness gesture).
+ *
  * UI contract: the existing EqualizerView passes values in 0..2 range (1f = neutral),
- * which we translate to/from mpv-style via [_multiplierToMpv] / [_mpvToMultiplier].
+ * which we translate to/from mpv-style -100..+100 internally.
  */
-@UnstableApi
 @Composable
 fun rememberVideoEqualizerState(player: Player?, activity: Activity?): VideoEqualizerState {
     val state = remember { VideoEqualizerState() }
@@ -43,7 +40,6 @@ fun rememberVideoEqualizerState(player: Player?, activity: Activity?): VideoEqua
     return state
 }
 
-@UnstableApi
 @Stable
 class VideoEqualizerState {
     /** mpv-style range: -100..+100, 0 = neutral */
@@ -64,7 +60,6 @@ class VideoEqualizerState {
 
     fun bindPlayer(player: ExoPlayer?) {
         exoPlayer = player
-        applyVideoEffects()
     }
 
     fun bindActivity(a: Activity?) {
@@ -77,25 +72,25 @@ class VideoEqualizerState {
         activity = null
     }
 
-    /** Accept mpv-style -100..+100 values from a future settings page */
-    fun setBrightnessMpv(v: Float) {
+    /** Accept mpv-style -100..+100 values */
+    fun setBrightnessMpvValue(v: Float) {
         brightnessMpv = v.coerceIn(-100f, 100f); applyScreenBrightness()
     }
-    fun setContrastMpv(v: Float) {
-        contrastMpv = v.coerceIn(-100f, 100f); applyVideoEffects()
+    fun setContrastMpvValue(v: Float) {
+        contrastMpv = v.coerceIn(-100f, 100f)
     }
-    fun setSaturationMpv(v: Float) {
-        saturationMpv = v.coerceIn(-100f, 100f); applyVideoEffects()
+    fun setSaturationMpvValue(v: Float) {
+        saturationMpv = v.coerceIn(-100f, 100f)
     }
 
     /** Accept UI slider in 0..2 range (existing EqualizerView contract) */
-    fun setBrightnessFromMultiplier(m: Float) = setBrightnessMpv(_multiplierToMpv(m))
-    fun setContrastFromMultiplier(m: Float) = setContrastMpv(_multiplierToMpv(m))
-    fun setSaturationFromMultiplier(m: Float) = setSaturationMpv(_multiplierToMpv(m))
+    fun setBrightnessFromMultiplier(m: Float) = setBrightnessMpvValue(_multiplierToMpv(m))
+    fun setContrastFromMultiplier(m: Float) = setContrastMpvValue(_multiplierToMpv(m))
+    fun setSaturationFromMultiplier(m: Float) = setSaturationMpvValue(_multiplierToMpv(m))
 
     fun reset() {
         brightnessMpv = 0f; contrastMpv = 0f; saturationMpv = 0f
-        applyScreenBrightness(); applyVideoEffects()
+        applyScreenBrightness()
     }
 
     fun applyProfile(b: Float, c: Float, s: Float) {
@@ -103,22 +98,7 @@ class VideoEqualizerState {
         brightnessMpv = _multiplierToMpv(b)
         contrastMpv = _multiplierToMpv(c)
         saturationMpv = _multiplierToMpv(s)
-        applyScreenBrightness(); applyVideoEffects()
-    }
-
-    @OptIn(UnstableApi::class)
-    private fun applyVideoEffects() {
-        val ep = exoPlayer ?: return
-        try {
-            // Contrast & saturation: 1f neutral (matches mpv's behaviour when its -100..100 is 0)
-            val rgb = RgbAdjustment.Builder()
-                .setContrastAdjustment(contrastMultiplier.coerceIn(0f, 2f))
-                .setSaturationAdjustment(saturationMultiplier.coerceIn(0f, 2f))
-                .build()
-            ep.setVideoEffects(listOf(rgb))
-        } catch (e: Exception) {
-            Log.w("VideoEq", "applyVideoEffects failed", e)
-        }
+        applyScreenBrightness()
     }
 
     /**

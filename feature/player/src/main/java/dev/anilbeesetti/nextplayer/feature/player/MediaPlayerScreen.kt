@@ -122,6 +122,7 @@ fun MediaPlayerScreen(
         volumeBoostEnabled = playerPreferences.enableVolumeBoost,
     )
     player ?: return
+    val context = LocalContext.current
     val metadataState = rememberMetadataState(player)
     val mediaPresentationState = rememberMediaPresentationState(player)
     val controlsVisibilityState = rememberControlsVisibilityState(

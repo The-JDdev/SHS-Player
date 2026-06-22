@@ -60,7 +60,6 @@ import dev.anilbeesetti.nextplayer.feature.player.extensions.switchTrack
 import dev.anilbeesetti.nextplayer.feature.player.extensions.uriToSubtitleConfiguration
 import dev.anilbeesetti.nextplayer.feature.player.extensions.videoZoom
 import android.media.audiofx.Equalizer
-import androidx.media3.exoplayer.DefaultRenderersFactory
 import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -524,11 +523,12 @@ class PlayerService : MediaSessionService() {
                 val provider = androidx.media3.session.DefaultMediaNotificationProvider
                     .Builder(this)
                     .setNotificationIdProvider(
-                        androidx.media3.session.DefaultMediaNotificationProvider.NotificationIdProvider { _, _ -> NOTIFICATION_ID },
+                        androidx.media3.session.DefaultMediaNotificationProvider.NotificationIdProvider { _ -> NOTIFICATION_ID },
                     )
-                    .setSmallIconResourceId(coreUiR.drawable.ic_notification_logo)
                     .setChannelId(NOTIFICATION_CHANNEL_ID)
                     .build()
+                // setSmallIcon is an instance method, not a builder method (Media3 1.9.2 API)
+                provider.setSmallIcon(coreUiR.drawable.ic_notification_logo)
                 this.setMediaNotificationProvider(provider)
             } catch (e: Exception) {
                 android.util.Log.w("PlayerService", "Custom notification provider setup failed", e)

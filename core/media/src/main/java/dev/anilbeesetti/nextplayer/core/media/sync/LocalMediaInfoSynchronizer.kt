@@ -117,11 +117,11 @@ class LocalMediaInfoSynchronizer @Inject constructor(
                 index = 0,
                 title = null,
                 codecName = mediaMetadataRetriever
-                    .extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE),
+                    .extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE) ?: "video/unknown",
                 language = null,
-                disposition = null,
-                bitRate = bitrate,
-                frameRate = null,
+                disposition = 0,
+                bitRate = bitrate ?: 0L,
+                frameRate = 0.0,
                 frameWidth = width,
                 frameHeight = height,
                 mediumUri = medium.mediumEntity.uriString,
@@ -131,18 +131,18 @@ class LocalMediaInfoSynchronizer @Inject constructor(
         val audioStreamsInfo = listOfNotNull(
             runCatching {
                 val sampleRate = mediaMetadataRetriever
-                    .extractMetadata(MediaMetadataRetriever.METADATA_KEY_SAMPLERATE)?.toIntOrNull()
+                    .extractMetadata(MediaMetadataRetriever.METADATA_KEY_SAMPLERATE)?.toIntOrNull() ?: 0
                 val channels = mediaMetadataRetriever
-                    .extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS)?.toIntOrNull()
+                    .extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS)?.toIntOrNull() ?: 0
                 val audioBitrate = mediaMetadataRetriever
-                    .extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)?.toLongOrNull()
+                    .extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)?.toLongOrNull() ?: 0L
                 AudioStreamInfoEntity(
                     index = 1,
                     title = null,
                     codecName = mediaMetadataRetriever
-                        .extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE),
+                        .extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE) ?: "audio/unknown",
                     language = null,
-                    disposition = null,
+                    disposition = 0,
                     bitRate = audioBitrate,
                     sampleFormat = null,
                     sampleRate = sampleRate,

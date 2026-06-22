@@ -47,7 +47,7 @@ abstract class HotspotManager internal constructor(context: Context) {
     abstract fun enable(): Boolean
 
     companion object {
-        private const val TAG = "HotspotManager"
+        internal const val TAG = "HotspotManager"
 
         fun newInstance(context: Context): HotspotManager? {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -84,17 +84,18 @@ class OreoHotspotManager(context: Context) : HotspotManager(context) {
 
     override fun enable(): Boolean {
         if (ActivityCompat.checkSelfPermission(
-                context, Manifest.permission.ACCESS_FINE_LOCATION,
-            ) != PackageManager.PERMISSION_GRANTED,
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
-            Log.w(TAG, "enable: ACCESS_FINE_LOCATION not granted")
+            Log.w(Companion.TAG, "enable: ACCESS_FINE_LOCATION not granted")
             return false
         }
         return try {
             wifiManager.startLocalOnlyHotspot(callback, Handler(Looper.getMainLooper()))
             true
         } catch (e: Throwable) {
-            Log.e(TAG, "startLocalOnlyHotspot failed", e)
+            Log.e(Companion.TAG, "startLocalOnlyHotspot failed", e)
             false
         }
     }
