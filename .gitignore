@@ -45,3 +45,4 @@ fastlane/test_output
 vendor/
 .bundle/
 .kotlinrelease.keystore
+release.keystore
