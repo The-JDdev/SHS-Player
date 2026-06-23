@@ -212,6 +212,11 @@ class MainActivity : ComponentActivity() {
                         BottomNavTab.MUSIC -> {
                             MusicScreen(modifier = Modifier.padding(paddingValues))
                         }
+                        BottomNavTab.WATCH_TV -> {
+                            dev.anilbeesetti.nextplayer.ui.tv.WatchTvScreen(
+                                modifier = Modifier.padding(paddingValues),
+                            )
+                        }
                         BottomNavTab.ME -> {
                             when (meSubScreen) {
                                 MeSubScreen.Main -> MeScreen(

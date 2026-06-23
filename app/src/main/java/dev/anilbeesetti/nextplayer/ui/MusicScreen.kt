@@ -742,7 +742,9 @@ fun MusicFilesList(
                     toDelete.forEach { s ->
                         runCatching {
                             val uri = android.content.ContentUris.withAppendedId(android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, s.id)
-                            context.contentResolver.delete(uri, null, null)
+                            runCatching { context.contentResolver.delete(uri, null, null) }.onFailure { e ->
+                        android.util.Log.w("MusicScreen", "bulk delete failed", e)
+                    }
                         }
                     }
                     selectedIds = emptySet()
@@ -1343,7 +1345,10 @@ fun MusicListItem(
             text = { Text("Are you sure you want to delete \"${song.title}\"?") },
             confirmButton = {
                 TextButton(onClick = {
-                    context.contentResolver.delete(songUri, null, null)
+                    runCatching { context.contentResolver.delete(songUri, null, null) }.onFailure { e ->
+                        android.util.Log.w("MusicScreen", "delete failed", e)
+                        android.widget.Toast.makeText(context, "Cannot delete: permission required", android.widget.Toast.LENGTH_LONG).show()
+                    }
                     showDeleteDialog = false
                 }) { Text("Delete", color = MaterialTheme.colorScheme.error) }
             },
@@ -1549,7 +1554,10 @@ fun MusicGridItem(
             text = { Text("Are you sure you want to delete \"${song.title}\"?") },
             confirmButton = {
                 TextButton(onClick = {
-                    context.contentResolver.delete(songUri, null, null)
+                    runCatching { context.contentResolver.delete(songUri, null, null) }.onFailure { e ->
+                        android.util.Log.w("MusicScreen", "delete failed", e)
+                        android.widget.Toast.makeText(context, "Cannot delete: permission required", android.widget.Toast.LENGTH_LONG).show()
+                    }
                     showDeleteDialog = false
                 }) { Text("Delete", color = MaterialTheme.colorScheme.error) }
             },

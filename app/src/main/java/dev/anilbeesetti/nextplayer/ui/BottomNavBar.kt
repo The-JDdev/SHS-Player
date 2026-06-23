@@ -26,6 +26,7 @@ import dev.anilbeesetti.nextplayer.core.ui.R as coreUiR
 enum class BottomNavTab(val iconRes: Int, val labelRes: Int) {
     VIDEOS(coreUiR.drawable.ic_video, coreUiR.string.video),
     MUSIC(coreUiR.drawable.ic_music_note, coreUiR.string.music),
+    WATCH_TV(coreUiR.drawable.ic_tv, coreUiR.string.watch_tv),
     ME(coreUiR.drawable.ic_person, coreUiR.string.me),
     TELEGRAM(coreUiR.drawable.ic_info, coreUiR.string.about_name),
 }

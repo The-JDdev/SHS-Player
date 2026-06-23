@@ -135,7 +135,9 @@ fun moveToVault(context: Context, uri: Uri, type: String): VaultFile? {
             context.contentResolver.openInputStream(uri)?.use { input ->
                 destFile.outputStream().use { output -> input.copyTo(output) }
             }
-            context.contentResolver.delete(uri, null, null)
+            runCatching { context.contentResolver.delete(uri, null, null) }.onFailure { e ->
+            android.util.Log.w("PrivacyFolder", "delete failed", e)
+        }
             val vaultFile = VaultFile(id, name, originalPath, type, size, destFile.absolutePath)
             val existing = getVaultFiles(context, type).toMutableList()
             existing.add(vaultFile)
