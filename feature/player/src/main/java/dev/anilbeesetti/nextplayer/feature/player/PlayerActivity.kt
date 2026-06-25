@@ -218,15 +218,12 @@ class PlayerActivity : ComponentActivity() {
         if (mediaController?.isPlaying != true) return
 
         // Defensive: check the system feature before doing anything else.
+        // On Android Go / low-end itel devices, FEATURE_PICTURE_IN_PICTURE may
+        // not be present even on API 26+. Skip silently — playback continues
+        // in the background via the PlayerService notification.
         val pm = packageManager
         if (!pm.hasSystemFeature(android.content.pm.PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
             android.util.Log.i("PlayerActivity", "PiP not supported on this device — skipping")
-            return
-        }
-        // Defensive: also call the Activity API (some ROMs report the feature but
-        // disable the API).
-        if (!isPictureInPictureSupported()) {
-            android.util.Log.i("PlayerActivity", "isPictureInPictureSupported()=false — skipping")
             return
         }
 

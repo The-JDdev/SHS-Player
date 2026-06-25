@@ -54,120 +54,13 @@
 
         <activity android:name=".crash.CrashActivity" />
 
-        <!-- ════════════════════════════════════════════════════════════════════════════
-             PHASE 5: OPEN-WITH INTENT FILTERS
-             Make SHS Player appear in "Open with" / "Share with" sheets for:
-               • video/* (local files + content URIs)
-               • audio/* (local files + content URIs)
-               • text/plain (URLs shared from browsers / other apps)
-             PlayerActivity handles ACTION_VIEW with a URI; the user is then offered
-             Play-or-Download inside the player UI.
-             ════════════════════════════════════════════════════════════════════════════ -->
-        <activity
-            android:name="dev.anilbeesetti.nextplayer.feature.player.PlayerActivity"
-            android:exported="true"
-            android:launchMode="singleTask"
-            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
-            android:supportsPictureInPicture="true"
-            android:resizeableActivity="true"
-            android:theme="@style/Theme.SHSPlayer.Splash">
-            <!-- Local video files (file://, content://) -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="content" />
-                <data android:scheme="file" />
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-                <data android:scheme="rtsp" />
-                <data android:scheme="rtmp" />
-                <data android:scheme="udp" />
-                <data android:mimeType="video/*" />
-                <data android:mimeType="application/x-mpegURL" />
-                <data android:mimeType="application/vnd.apple.mpegURL" />
-                <data android:mimeType="application/dash+xml" />
-                <data android:mimeType="application/mp4" />
-                <data android:mimeType="application/ogg" />
-                <data android:mimeType="application/x-ogg" />
-                <data android:mimeType="application/x-flv" />
-                <data android:mimeType="application/matroska" />
-                <data android:mimeType="application/x-matroska" />
-                <data android:mimeType="application/x-iso9660-image" />
-            </intent-filter>
-            <!-- Video by extension (no MIME type from sender) -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="content" />
-                <data android:scheme="file" />
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-                <data android:host="*" />
-                <data android:pathPattern=".*\.mp4" />
-                <data android:pathPattern=".*\.mkv" />
-                <data android:pathPattern=".*\.webm" />
-                <data android:pathPattern=".*\.avi" />
-                <data android:pathPattern=".*\.mov" />
-                <data android:pathPattern=".*\.flv" />
-                <data android:pathPattern=".*\.ts" />
-                <data android:pathPattern=".*\.m4v" />
-                <data android:pathPattern=".*\.3gp" />
-                <data android:pathPattern=".*\.m3u8" />
-                <data android:pathPattern=".*\.mpd" />
-            </intent-filter>
-            <!-- Plain-text URL sharing (browser share, etc.) -->
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/plain" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:name="dev.anilbeesetti.nextplayer.feature.player.AudioPlayerActivity"
-            android:exported="true"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.SHSPlayer.Splash">
-            <!-- Local audio files -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="content" />
-                <data android:scheme="file" />
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-                <data android:mimeType="audio/*" />
-                <data android:mimeType="application/ogg" />
-                <data android:mimeType="application/x-ogg" />
-                <data android:mimeType="application/x-flac" />
-            </intent-filter>
-            <!-- Audio by extension -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="content" />
-                <data android:scheme="file" />
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-                <data android:host="*" />
-                <data android:pathPattern=".*\.mp3" />
-                <data android:pathPattern=".*\.m4a" />
-                <data android:pathPattern=".*\.flac" />
-                <data android:pathPattern=".*\.wav" />
-                <data android:pathPattern=".*\.ogg" />
-                <data android:pathPattern=".*\.opus" />
-                <data android:pathPattern=".*\.aac" />
-                <data android:pathPattern=".*\.wma" />
-            </intent-filter>
-        </activity>
+        <!--
+            PHASE 5: OPEN-WITH INTENT FILTERS
+            The PlayerActivity and AudioPlayerActivity intent filters (video/*,
+            audio/*, text/plain URL share, video/audio by extension) live in
+            feature/player/src/main/AndroidManifest.xml so they ship with the
+            feature module. See that file for the full filter list.
+        -->
 
         <provider
             android:name="androidx.core.content.FileProvider"

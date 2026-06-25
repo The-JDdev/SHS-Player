@@ -733,6 +733,36 @@
                 <data android:pathPattern="/.*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.WEBM" />
                 <data android:pathPattern="/.*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.WEBM" />
             </intent-filter>
+
+            <!-- PHASE 5: ACTION_SEND for shared video content URIs -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+
+            <!-- PHASE 5: text/plain URL share (browser share / messenger share).
+                 PlayerActivity.normaliseIntentUri() extracts URLs from EXTRA_TEXT. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+
+            <!-- PHASE 5: Extra video MIME types -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:mimeType="application/x-mpegURL" />
+                <data android:mimeType="application/dash+xml" />
+                <data android:mimeType="application/x-flv" />
+                <data android:mimeType="application/x-iso9660-image" />
+            </intent-filter>
         </activity>
 
         <service

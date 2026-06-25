@@ -1,7 +1,6 @@
 package dev.anilbeesetti.nextplayer.core.ui.components.glass
 
 import android.os.Build
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -83,12 +82,6 @@ fun Modifier.glassCard(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 it.blur(blurRadius)
             } else it
-        }
-        .graphicsLayer {
-            // Subtle shadow
-            shadowElevation = 8f
-            shape = androidx.compose.ui.geometry.RoundedCornerShape(cornerRadius.value * density)
-            clip = true
         }
 }
 

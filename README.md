@@ -4,11 +4,11 @@
 
 ### The Ultimate Open-Source Multimedia Engine for Android
 
-**A privacy-first, dual-engine, feature-packed video & music player built with Jetpack Compose — forked from Next Player and supercharged with a Privacy Vault, Wi-Fi file transfer, IPTV live TV, an in-app music library, a VLC engine, and a QR share ecosystem.**
+**A privacy-first, dual-engine, feature-packed video & music player built with Jetpack Compose — forked from Next Player and supercharged with a Glassmorphism UI, Privacy Vault, Wi-Fi file transfer, IPTV live TV, an in-app music library, a VLC engine, universal downloader, and a QR share ecosystem.**
 
-`v0.15.7` · Built from Bangladesh 🇧🇩 · by **Sajjad Hussain Shobuj (SHS)**
+`v0.16.0` · Built from Bangladesh 🇧🇩 · by **Sajjad Hussain Shobuj (SHS)**
 
-[![GitHub release](https://img.shields.io/github/v/release/The-JDdev/SHS-Player?style=for-the-badge&logo=github&color=4285F4)](https://github.com/The-JDdev/SHS-Player/releases)
+[![GitHub release](https://img.shields.io/github/v/release/The-JDdev/SHS-Player?style=for-the-badge&logo=github&color=4285F4)](https://github.com/The-JDdev/SHS-Player/releases/tag/v0.16.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge&logo=open-source-initiative&logoColor=white)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Android%206.0%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://www.android.com)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.3.0-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org)
@@ -17,6 +17,16 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-ff69b4.svg?style=for-the-badge&logo=git&logoColor=white)](CONTRIBUTING.md)
 [![Telegram](https://img.shields.io/badge/Telegram-Join%20Chat-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/aamoviesofficial)
 
+### 📥 Download v0.16.0
+
+| APK | ABI | Best for | Size |
+|:---:|:---:|:---|:---:|
+| [`SHS-Player-v0.16.0-arm64-v8a.apk`](https://github.com/The-JDdev/SHS-Player/releases/download/v0.16.0/SHS-Player-v0.16.0-arm64-v8a.apk) | 64-bit ARM | Pixel, Samsung, **itel vision 1 pro**, modern phones | ~82 MB |
+| [`SHS-Player-v0.16.0-armeabi-v7a.apk`](https://github.com/The-JDdev/SHS-Player/releases/download/v0.16.0/SHS-Player-v0.16.0-armeabi-v7a.apk) | 32-bit ARM | Older / low-end 32-bit phones | ~77 MB |
+| [`SHS-Player-v0.16.0-universal.apk`](https://github.com/The-JDdev/SHS-Player/releases/download/v0.16.0/SHS-Player-v0.16.0-universal.apk) | All ABIs | Any device (largest, foolproof) | ~231 MB |
+
+> **itel vision 1 pro?** → Use **arm64-v8a** (it's a 64-bit ARM device).
+
 </div>
 
 ---
@@ -24,36 +34,39 @@
 ## 📑 Table of Contents
 
 1. [Overview](#-overview)
-2. [Why SHS Player?](#-why-shs-player)
-3. [Feature Comparison](#-feature-comparison)
-4. [Detailed Feature Set](#-detailed-feature-set)
+2. [What's New in v0.16.0 (8-Phase Overhaul)](#-whats-new-in-v0160-8-phase-overhaul)
+3. [Why SHS Player?](#-why-shs-player)
+4. [Feature Comparison](#-feature-comparison)
+5. [Detailed Feature Set](#-detailed-feature-set)
    - [🎥 Video Player](#-video-player)
    - [🎵 Music & Audio Player](#-music--audio-player)
    - [📺 IPTV / Live TV](#-iptv--live-tv)
    - [🔒 Privacy Vault](#-privacy-vault)
    - [📡 Wi-Fi File Transfer](#-wi-fi-file-transfer)
    - [📱 QR Scanner & Share](#-qr-scanner--share)
+   - [🌐 Universal Downloader](#-universal-downloader)
+   - [🪟 Glassmorphism UI Kit](#-glassmorphism-ui-kit)
    - [🗂️ Media Library](#-media-library)
    - [⚙️ Settings & Customization](#-settings--customization)
-5. [Screenshots](#-screenshots)
-6. [Architecture](#-architecture)
-7. [Tech Stack](#-tech-stack)
-8. [Project Structure](#-project-structure)
-9. [Getting Started](#-getting-started)
-10. [Building from Source](#-building-from-source)
-11. [Development](#-development)
-12. [Permissions Explained](#-permissions-explained)
-13. [Privacy & Security](#-privacy--security)
-14. [Internationalization](#-internationalization)
-15. [Contributing](#-contributing)
-16. [Code of Conduct](#-code-of-conduct)
-17. [Security Policy](#-security-policy)
-18. [License](#-license)
-19. [Credits & Acknowledgements](#-credits--acknowledgements)
-20. [Support the Project](#-support-the-project)
-21. [Community](#-community)
-22. [FAQ](#-faq)
-23. [Roadmap](#-roadmap)
+6. [Screenshots](#-screenshots)
+7. [Architecture](#-architecture)
+8. [Tech Stack](#-tech-stack)
+9. [Project Structure](#-project-structure)
+10. [Getting Started](#-getting-started)
+11. [Building from Source](#-building-from-source)
+12. [Development](#-development)
+13. [Permissions Explained](#-permissions-explained)
+14. [Privacy & Security](#-privacy--security)
+15. [Internationalization](#-internationalization)
+16. [Contributing](#-contributing)
+17. [Code of Conduct](#-code-of-conduct)
+18. [Security Policy](#-security-policy)
+19. [License](#-license)
+20. [Credits & Acknowledgements](#-credits--acknowledgements)
+21. [Support the Project](#-support-the-project)
+22. [Community](#-community)
+23. [FAQ](#-faq)
+24. [Roadmap](#-roadmap)
 
 ---
 
@@ -67,9 +80,30 @@
 
 The app is written in **100% Kotlin** with **Jetpack Compose** for the entire UI layer, follows **Clean Architecture** across **12 Gradle modules**, uses **Hilt** for dependency injection, **Room** + **DataStore** for persistence, and is localised into **40+ languages**.
 
-> **Latest version:** `0.15.7` (versionCode `54`)
+> **Latest version:** `0.16.0` (versionCode `55`) — [Download APK](https://github.com/The-JDdev/SHS-Player/releases/tag/v0.16.0)
 > **Min Android:** 6.0 (API 23) · **Target:** Android 16 (API 36)
 > **Application ID:** `dev.anilbeesetti.nextplayer` (retained for upstream compatibility)
+
+---
+
+## 🆕 What's New in v0.16.0 (8-Phase Overhaul)
+
+v0.16.0 is the biggest release in the project's history — a single 8-phase master overhaul that touches the UI layer, audio engine, secret vault, network streaming, intent capture, video player core, P2P UX, and Live TV.
+
+| Phase | Headline change | Key files |
+|:---:|---|---|
+| **1 Glassmorphism UI** | New `GlassCard`/`glassPanel`/`GlassIconButton` modifiers with vibrant Google Material palette (7 colors + 3 gradient trios) + PLAYit-style drag-drop customizable player controls row | `core/ui/components/glass/GlassModifiers.kt`, `Color.kt`, `CustomizablePlayerControlsRow.kt` |
+| **2 Audio Engine** | Fixed queue bug (back-press stops audio, new file clears queue), fixed "Connecting to player…" loading screen bug, added Audio Playlists (Room v4→v5 migration with `PlaylistDao` + `PlaylistRepository`) | `AudioPlayerActivity.kt`, `AudioPlayerScreen.kt`, `PlaylistDao.kt`, `PlaylistEntity.kt`, `PlaylistRepository.kt`, `MediaDatabase.kt` |
+| **3 Secret Vault** | Vault videos now force-open in internal `PlayerActivity` (no external leak); restore-to-gallery uses `MediaStore.createWriteRequest`; permanent delete does secure-erase overwrite | `PrivacyFolderScreen.kt` |
+| **4 Universal Downloader** | `UniversalDownloader.kt` — yt-dlp wrapper via reflection + direct HTTP fallback; `updateYtDlpIfNeeded()` auto-updates the yt-dlp binary from GitHub releases every 24h; `DownloadStreamDialog.kt` UI | `feature/player/download/*` |
+| **5 Open With** | `PlayerActivity` now declares `ACTION_VIEW` + `ACTION_SEND` intent filters for `video/*`, `audio/*`, `text/plain` URLs + 12 video extensions + 8 audio extensions; `normaliseIntentUri()` extracts URLs from `EXTRA_TEXT` | `feature/player/src/main/AndroidManifest.xml`, `PlayerActivity.kt` |
+| **6 Player Core** | Low-end PiP fix (`FEATURE_PICTURE_IN_PICTURE` check before entering PiP, no more crashes on itel vision 1 pro); real audio delay via `DelayAudioProcessor` injected into ExoPlayer's audio chain | `PlayerActivity.kt`, `DelayAudioProcessor.kt`, `ShsRenderersFactory.kt`, `PlayerService.kt` |
+| **7 P2P UX** | New `P2pPermissionSetupCard` composable with live status chips + stepped action button ("Tap to turn on Wi-Fi" → "Tap to turn on Location" → "Grant permissions" → "Start sharing") using ActivityResult API | `share/P2pPermissionSetupCard.kt`, `FileTransferScreen.kt` |
+| **8 Live TV** | IPTV channels now categorized into Bangladesh · Sports · News · Popular · Free Channels tabs with heuristic resolver + 10 iptv-org playlists mapped to categories | `tv/M3uParser.kt`, `tv/WatchTvScreen.kt` |
+
+**Build stats:** 17 files modified, 8 new files added, ~944 LOC additions across 12 modules. Built on Kotlin 2.3.0, AGP 8.13.2, Media3 1.9.2, LibVLC 3.6.0-eap5, Room 2.8.4 (v5 schema).
+
+See the [v0.16.0 release notes](https://github.com/The-JDdev/SHS-Player/releases/tag/v0.16.0) for the full changelog.
 
 ---
 
@@ -260,6 +294,38 @@ A local-only file transfer server (`FileTransferScreen`, ~770 lines) — **no in
   - Hotspot mode: `hs;pin;ssid;bssid;password;end`
   - Wi-Fi LAN mode: `wf;pin;ssid;bssid;ip;end`
 - **`HotspotManager`** — wraps `WifiManager.startLocalOnlyHotspot` (API 26+) for sending without an existing Wi-Fi network, plus a `SecureRandom` 6-digit `PinGenerator`.
+- **`P2pPermissionSetupCard`** (Phase 7) — modern permission UX that steps the user through turning on Wi-Fi → Location → granting permissions, with live status chips. No more blind permission nagging.
+
+---
+
+### 🌐 Universal Downloader
+
+Introduced in v0.16.0 Phase 4 — a backend that can extract and download any online video/audio directly from the player.
+
+- **`UniversalDownloader.kt`** — wraps `youtubedl-android` (a `yt-dlp` port for Android) via reflection, with a transparent fallback to direct HTTP stream download for MP4/MP3/M3U8 URLs.
+- **`extractStreamInfo(url)`** — fetches the list of available formats (formatId, extension, codec, filesize) for a URL. Works for YouTube, M3U8, direct MP4/MP3, Live TV.
+- **`download(url, formatId, targetFile, onProgress)`** — downloads the chosen format with byte-level progress reporting via `DownloadProgress` flow.
+- **`updateYtDlpIfNeeded(force)`** — auto-update logic. Fetches the latest `yt-dlp_linux` binary from the [yt-dlp GitHub releases API](https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest), replaces the local copy at `context.filesDir/ytdlp/yt-dlp`, and makes it executable. Runs automatically every 24 hours so extractors never break when websites change their HTML/JSON.
+- **`DownloadStreamDialog.kt`** — UI shown when the user taps "Download" in the player. Lists all formats, lets the user pick quality, shows a live progress bar, and saves to `Movies/SHSPlayer/`.
+
+> **Note on native lib size:** `youtubedl-android` ships a ~20 MB ffmpeg binary, so it's intentionally declared as an *optional* dependency in `feature/player/build.gradle.kts` (commented out by default). `UniversalDownloader` uses reflection — if the library is absent, it transparently falls back to direct HTTP download. To enable yt-dlp extraction, uncomment the dependency lines in `feature/player/build.gradle.kts`.
+
+---
+
+### 🪟 Glassmorphism UI Kit
+
+Introduced in v0.16.0 Phase 1 — modern "frosted glass" aesthetic with vibrant Google Material colors.
+
+- **`glassCard(cornerRadius, alpha, blurRadius)`** modifier — translucent surface with vibrant gradient tint (primary → transparent → tertiary), top-edge highlight (light refraction), and hardware-accelerated `Modifier.blur()` on Android 12+ (software-fallback tint-only on older Android).
+- **`glassPanel(cornerRadius, alpha)`** modifier — thinner variant for buttons, chips, and tiles inside the player overlay.
+- **`GlassCard`** and **`GlassIconButton`** — pre-built composables for common patterns.
+- **Vibrant Google palette** in `Color.kt`:
+  - `glassBlue` (#4285F4), `glassRed` (#EA4335), `glassYellow` (#FBBC05), `glassGreen` (#34A853), `glassPurple` (#9C27B0), `glassCyan` (#00BCD4), `glassOrange` (#FF6D00)
+  - Pre-built gradients: `glassGradientVibrant` (blue→purple→red), `glassGradientCool` (cyan→blue→green), `glassGradientWarm` (yellow→orange→red)
+- **PLAYit-style drag-and-drop customizable controls** (`CustomizablePlayerControlsRow.kt`):
+  - Long-press + drag to reorder control buttons (snap-swaps at midpoint).
+  - Drag a button out 2× its width to remove it from the row.
+  - Pencil-icon "Customize" button opens a dialog with eye/eye-off toggles to show/hide any control.
 
 ---
 

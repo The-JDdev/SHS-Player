@@ -22,16 +22,17 @@ import java.util.ArrayDeque
  *  - Negative `delayMs` → skip N ms of audio at the start of each playback
  *    chunk so audio effectively plays earlier.
  *
- * Implementation: a queue of fixed-size byte buffers. On `queueInput`, we
- * push the incoming bytes; on `getOutput`, we either hold back (delay) or
- * skip (advance) the requested number of bytes.
- *
  * Range: -10000 ms .. +10000 ms (matches the UI range).
  */
 class DelayAudioProcessor : BaseAudioProcessor() {
 
+    /**
+     * Empty companion object — kept for any future @JvmStatic helpers.
+     * (Previously had two companion objects which caused a compile error.)
+     */
     companion object {
         private const val TAG = "DelayAudioProcessor"
+        private val EMPTY_BUFFER: ByteBuffer = ByteBuffer.allocateDirect(0).order(ByteOrder.nativeOrder())
     }
 
     @Volatile
@@ -149,9 +150,5 @@ class DelayAudioProcessor : BaseAudioProcessor() {
             currentOutput = EMPTY_BUFFER
             pendingAudioFormat = null
         }
-    }
-
-    companion object {
-        private val EMPTY_BUFFER: ByteBuffer = ByteBuffer.allocateDirect(0).order(ByteOrder.nativeOrder())
     }
 }

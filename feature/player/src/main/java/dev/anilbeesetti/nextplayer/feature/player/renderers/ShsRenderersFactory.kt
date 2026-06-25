@@ -1,14 +1,9 @@
 package dev.anilbeesetti.nextplayer.feature.player.renderers
 
 import android.content.Context
-import android.os.Handler
 import androidx.media3.exoplayer.DefaultRenderersFactory
-import androidx.media3.exoplayer.Renderer
-import androidx.media3.exoplayer.audio.AudioProcessor
 import androidx.media3.exoplayer.audio.AudioSink
 import androidx.media3.exoplayer.audio.DefaultAudioSink
-import androidx.media3.exoplayer.audio.MediaCodecAudioRenderer
-import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 import dev.anilbeesetti.nextplayer.feature.player.audio.DelayAudioProcessor
 
 /**
@@ -32,15 +27,10 @@ class ShsRenderersFactory(context: Context) : DefaultRenderersFactory(context) {
         enableFloatOutput: Boolean,
         enableAudioTrackPlaybackParams: Boolean,
     ): AudioSink {
-        // Inject our delay processor BEFORE the default silence-skipping + channel-mixing processors.
+        // Inject our delay processor as the FIRST processor in the chain so
+        // it sees the raw PCM before any silence-skipping / channel-mixing.
         return DefaultAudioSink.Builder(context)
-            .setAudioProcessors(
-                arrayOf<AudioProcessor>(
-                    delayAudioProcessor,
-                    // Standard processors in the default order
-                    DefaultAudioSink.DEFAULT_AUDIO_PROCESSOR_CHAIN.first(),
-                ),
-            )
+            .setAudioProcessors(arrayOf(delayAudioProcessor))
             .setEnableFloatOutput(enableFloatOutput)
             .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
             .build()
