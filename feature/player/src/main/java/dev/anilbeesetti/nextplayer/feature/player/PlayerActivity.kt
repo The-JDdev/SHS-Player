@@ -595,22 +595,35 @@ class PlayerActivity : ComponentActivity() {
     }
 
     private suspend fun playVideo(uri: Uri) = withContext(Dispatchers.Default) {
+        // MX Player pattern — accept `video_list` extra to override the auto-derived playlist.
+        val intentVideoList = PlayerIntentExtras.extractVideoList(intent)
         val mediaContentUri = getMediaContentUri(uri)
-        val playlist = playerApi.getPlaylist().takeIf { it.isNotEmpty() }
-            ?: mediaContentUri?.let { mediaUri ->
-                viewModel.getPlaylistFromUri(mediaUri)
-                    .map { it.uriString }
-                    .toMutableList()
-                    .apply {
-                        if (!contains(mediaUri.toString())) {
-                            add(index = 0, element = mediaUri.toString())
+
+        // Prefer the intent-supplied video_list if present; otherwise fall back to playerApi + auto.
+        val playlist: List<String> = if (intentVideoList.size > 1) {
+            intentVideoList.map { it.toString() }
+        } else {
+            playerApi.getPlaylist().takeIf { it.isNotEmpty() }
+                ?: mediaContentUri?.let { mediaUri ->
+                    viewModel.getPlaylistFromUri(mediaUri)
+                        .map { it.uriString }
+                        .toMutableList()
+                        .apply {
+                            if (!contains(mediaUri.toString())) {
+                                add(index = 0, element = mediaUri.toString())
+                            }
                         }
-                    }
-            } ?: listOf(uri.toString())
+                } ?: listOf(uri.toString())
+        }
 
         val mediaItemIndexToPlay = playlist.indexOfFirst {
             it == (mediaContentUri ?: uri).toString()
         }.takeIf { it >= 0 } ?: 0
+
+        // MX Player pattern — accept `subs` parallel-array extra for external subtitles.
+        val intentSubs = PlayerIntentExtras.extractSubs(intent)
+        // MX Player pattern — accept `position` extra for explicit start position.
+        val intentPositionMs = PlayerIntentExtras.extractPositionMs(intent).takeIf { it >= 0 }
 
         val mediaItems = playlist.mapIndexed { index, uri ->
             MediaItem.Builder().apply {
@@ -632,15 +645,22 @@ class PlayerActivity : ComponentActivity() {
                 if (index == mediaItemIndexToPlay) {
                     setMediaMetadata(
                         MediaMetadata.Builder().apply {
-                            setTitle(playerApi.title)
-                            setExtras(positionMs = playerApi.position?.toLong())
+                            setTitle(playerApi.title ?: intent.getStringExtra(PlayerIntentExtras.TITLE))
+                            setExtras(positionMs = playerApi.position?.toLong() ?: intentPositionMs)
                         }.build(),
                     )
+                    // Merge playerApi subs + intent extras (MX Player `subs` parallel array pattern)
                     val apiSubs = playerApi.getSubs().map { subtitle ->
                         uriToSubtitleConfiguration(
                             uri = subtitle.uri,
                             subtitleEncoding = playerPreferences?.subtitleTextEncoding ?: "",
                             isSelected = subtitle.isSelected,
+                        )
+                    } + intentSubs.map { subExtra ->
+                        uriToSubtitleConfiguration(
+                            uri = subExtra.uri,
+                            subtitleEncoding = playerPreferences?.subtitleTextEncoding ?: "",
+                            isSelected = subExtra.enabled,
                         )
                     }
                     setSubtitleConfigurations(apiSubs)
@@ -650,7 +670,11 @@ class PlayerActivity : ComponentActivity() {
 
         withContext(Dispatchers.Main) {
             mediaController?.run {
-                setMediaItems(mediaItems, mediaItemIndexToPlay, playerApi.position?.toLong() ?: C.TIME_UNSET)
+                setMediaItems(
+                    mediaItems,
+                    mediaItemIndexToPlay,
+                    playerApi.position?.toLong() ?: intentPositionMs ?: C.TIME_UNSET,
+                )
                 playWhenReady = viewModel.playWhenReady
                 prepare()
             }
