@@ -54,63 +54,13 @@
 
         <activity android:name=".crash.CrashActivity" />
 
-        <!-- ════════════════════════════════════════════════════════════════════════════
-             AudioPlayerActivity — dedicated audio-only player.
-             MUST be declared here (in the :app module manifest) because the
-             feature/player module's manifest only declares PlayerActivity.
-             Without this declaration, launching AudioPlayerActivity crashes
-             with ActivityNotFoundException. (Regression introduced in v0.16.0
-             when the manifest was refactored for Phase 5 intent filters.)
-             ════════════════════════════════════════════════════════════════════════════ -->
-        <activity
-            android:name="dev.anilbeesetti.nextplayer.feature.player.AudioPlayerActivity"
-            android:exported="true"
-            android:launchMode="singleTask"
-            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
-            android:theme="@style/Theme.SHSPlayer.Splash">
-
-            <!-- ACTION_VIEW for audio MIME types (local files + content URIs) -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="content" />
-                <data android:scheme="file" />
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-                <data android:mimeType="audio/*" />
-                <data android:mimeType="application/ogg" />
-                <data android:mimeType="application/x-ogg" />
-                <data android:mimeType="application/x-flac" />
-            </intent-filter>
-
-            <!-- Audio by extension (when sender doesn't supply a MIME type) -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="content" />
-                <data android:scheme="file" />
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-                <data android:host="*" />
-                <data android:pathPattern=".*\.mp3" />
-                <data android:pathPattern=".*\.m4a" />
-                <data android:pathPattern=".*\.flac" />
-                <data android:pathPattern=".*\.wav" />
-                <data android:pathPattern=".*\.ogg" />
-                <data android:pathPattern=".*\.opus" />
-                <data android:pathPattern=".*\.aac" />
-                <data android:pathPattern=".*\.wma" />
-            </intent-filter>
-        </activity>
-
         <!--
-            PHASE 5: PlayerActivity intent filters (video/*, audio/*, text/plain
-            URL share, video by extension) live in feature/player/src/main/AndroidManifest.xml
-            where PlayerActivity is originally declared.
+            AudioPlayerActivity and PlayerActivity are both declared in
+            feature/player/src/main/AndroidManifest.xml (where their Kotlin
+            classes live) — the manifest merger combines them into the final
+            APK manifest. See that file for the full intent-filter list
+            (ACTION_VIEW + ACTION_SEND + ACTION_SEND_MULTIPLE for video/*,
+            audio/*, text/plain URLs, audio/video by extension).
         -->
 
         <provider

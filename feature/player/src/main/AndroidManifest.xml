@@ -12,6 +12,9 @@
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|uiMode|keyboard|keyboardHidden|navigation"
             android:exported="true"
             android:launchMode="singleTask"
+            android:alwaysRetainTaskState="true"
+            android:autoRemoveFromRecents="true"
+            android:resizeableActivity="true"
             android:supportsPictureInPicture="true"
             android:theme="@style/NextPlayer"
             tools:targetApi="o">
@@ -762,6 +765,89 @@
                 <data android:mimeType="application/dash+xml" />
                 <data android:mimeType="application/x-flv" />
                 <data android:mimeType="application/x-iso9660-image" />
+            </intent-filter>
+        </activity>
+
+        <!-- ════════════════════════════════════════════════════════════════════════════
+             AudioPlayerActivity — dedicated audio-only player (Phase 2 of v0.16.0).
+             Declared here in the :feature:player manifest where PlayerActivity also
+             lives, so the activity class is always co-located with its manifest
+             entry. Mirrors the mpv-android pattern where MPVActivity is the single
+             playback activity handling both audio and video.
+             ════════════════════════════════════════════════════════════════════════════ -->
+        <activity
+            android:name=".AudioPlayerActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:alwaysRetainTaskState="true"
+            android:autoRemoveFromRecents="true"
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
+            android:theme="@style/NextPlayer">
+
+            <!-- ACTION_VIEW for audio MIME types (local files + content URIs) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="audio/*" />
+                <data android:mimeType="application/ogg" />
+                <data android:mimeType="application/x-ogg" />
+                <data android:mimeType="application/x-flac" />
+            </intent-filter>
+
+            <!-- HTTP(S) audio streaming -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:mimeType="audio/*" />
+                <data android:mimeType="application/ogg" />
+                <data android:mimeType="application/x-flac" />
+            </intent-filter>
+
+            <!-- Audio by extension (no MIME type from sender) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:pathPattern=".*\.mp3" />
+                <data android:pathPattern=".*\..*\.mp3" />
+                <data android:pathPattern=".*\..*\..*\.mp3" />
+                <data android:pathPattern=".*\.m4a" />
+                <data android:pathPattern=".*\..*\.m4a" />
+                <data android:pathPattern=".*\.flac" />
+                <data android:pathPattern=".*\..*\.flac" />
+                <data android:pathPattern=".*\.wav" />
+                <data android:pathPattern=".*\..*\.wav" />
+                <data android:pathPattern=".*\.ogg" />
+                <data android:pathPattern=".*\..*\.ogg" />
+                <data android:pathPattern=".*\.opus" />
+                <data android:pathPattern=".*\.aac" />
+                <data android:pathPattern=".*\.wma" />
+            </intent-filter>
+
+            <!-- ACTION_SEND single share -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/*" />
+                <data android:mimeType="application/ogg" />
+                <data android:mimeType="application/x-flac" />
+            </intent-filter>
+
+            <!-- ACTION_SEND_MULTIPLE — share multiple audio files at once (mpv-android pattern) -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/*" />
             </intent-filter>
         </activity>
 
