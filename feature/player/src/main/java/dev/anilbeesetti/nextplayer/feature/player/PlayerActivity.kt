@@ -744,7 +744,7 @@ class PlayerActivity : ComponentActivity() {
     }
 
     override fun finish() {
-        if (playerApi.shouldReturnResult) {
+        if (::playerApi.isInitialized && playerApi.shouldReturnResult) {
             val result = playerApi.getResult(
                 isPlaybackFinished = isPlaybackFinished,
                 duration = mediaController?.duration ?: C.TIME_UNSET,
