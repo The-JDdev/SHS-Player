@@ -4,26 +4,26 @@
 
 ### The Ultimate Open-Source Multimedia Engine for Android
 
-**A privacy-first, dual-engine, feature-packed video & music player built with Jetpack Compose — forked from Next Player and supercharged with a Glassmorphism UI, Privacy Vault, Wi-Fi file transfer, IPTV live TV, an in-app music library, a VLC engine, universal downloader, and a QR share ecosystem.**
+**A privacy-first, dual-engine, feature-packed video & music player built with Jetpack Compose — forked from Next Player and supercharged with a Glassmorphism UI, Privacy Vault, Wi-Fi file transfer, IPTV live TV, an in-app music library, LibVLC as the primary engine, universal downloader, and a QR share ecosystem.**
 
-`v0.16.0` · Built from Bangladesh 🇧🇩 · by **Sajjad Hussain Shobuj (SHS)**
+`v0.17.0` · Built from Bangladesh 🇧🇩 · by **Sajjad Hussain Shobuj (SHS)**
 
-[![GitHub release](https://img.shields.io/github/v/release/The-JDdev/SHS-Player?style=for-the-badge&logo=github&color=4285F4)](https://github.com/The-JDdev/SHS-Player/releases/tag/v0.16.0)
+[![GitHub release](https://img.shields.io/github/v/release/The-JDdev/SHS-Player?style=for-the-badge&logo=github&color=4285F4)](https://github.com/The-JDdev/SHS-Player/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge&logo=open-source-initiative&logoColor=white)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Android%206.0%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://www.android.com)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.3.0-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org)
 [![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-2026.01.00-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
-[![Media3](https://img.shields.io/badge/AndroidX%20Media3-1.9.2-34A853?style=for-the-badge&logo=android&logoColor=white)](https://developer.android.com/media/media3)
+[![LibVLC](https://img.shields.io/badge/LibVLC-3.6.0--eap5-FF8800?style=for-the-badge&logo=videolan&logoColor=white)](https://www.videolan.org/vlc/libvlc.html)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-ff69b4.svg?style=for-the-badge&logo=git&logoColor=white)](CONTRIBUTING.md)
 [![Telegram](https://img.shields.io/badge/Telegram-Join%20Chat-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/aamoviesofficial)
 
-### 📥 Download v0.16.0
+### 📥 Download v0.17.0
 
 | APK | ABI | Best for | Size |
 |:---:|:---:|:---|:---:|
-| [`SHS-Player-v0.16.0-arm64-v8a.apk`](https://github.com/The-JDdev/SHS-Player/releases/download/v0.16.0/SHS-Player-v0.16.0-arm64-v8a.apk) | 64-bit ARM | Pixel, Samsung, **itel vision 1 pro**, modern phones | ~82 MB |
-| [`SHS-Player-v0.16.0-armeabi-v7a.apk`](https://github.com/The-JDdev/SHS-Player/releases/download/v0.16.0/SHS-Player-v0.16.0-armeabi-v7a.apk) | 32-bit ARM | Older / low-end 32-bit phones | ~77 MB |
-| [`SHS-Player-v0.16.0-universal.apk`](https://github.com/The-JDdev/SHS-Player/releases/download/v0.16.0/SHS-Player-v0.16.0-universal.apk) | All ABIs | Any device (largest, foolproof) | ~231 MB |
+| [`SHS-Player-v0.17.0-arm64-v8a.apk`](https://github.com/The-JDdev/SHS-Player/releases/download/v0.17.0/SHS-Player-v0.17.0-arm64-v8a.apk) | 64-bit ARM | Pixel, Samsung, **itel vision 1 pro**, modern phones | ~82 MB |
+| [`SHS-Player-v0.17.0-armeabi-v7a.apk`](https://github.com/The-JDdev/SHS-Player/releases/download/v0.17.0/SHS-Player-v0.17.0-armeabi-v7a.apk) | 32-bit ARM | Older / low-end 32-bit phones | ~77 MB |
+| [`SHS-Player-v0.17.0-universal.apk`](https://github.com/The-JDdev/SHS-Player/releases/download/v0.17.0/SHS-Player-v0.17.0-universal.apk) | All ABIs | Any device (largest, foolproof) | ~231 MB |
 
 > **itel vision 1 pro?** → Use **arm64-v8a** (it's a 64-bit ARM device).
 
@@ -34,10 +34,11 @@
 ## 📑 Table of Contents
 
 1. [Overview](#-overview)
-2. [What's New in v0.16.0 (8-Phase Overhaul)](#-whats-new-in-v0160-8-phase-overhaul)
-3. [Why SHS Player?](#-why-shs-player)
-4. [Feature Comparison](#-feature-comparison)
-5. [Detailed Feature Set](#-detailed-feature-set)
+2. [What's New in v0.17.0 (LibVLC Default + Bug Fix Release)](#-whats-new-in-v0170-libvlc-default--bug-fix-release)
+3. [What's New in v0.16.0 (8-Phase Overhaul)](#-whats-new-in-v0160-8-phase-overhaul)
+4. [Why SHS Player?](#-why-shs-player)
+5. [Feature Comparison](#-feature-comparison)
+6. [Detailed Feature Set](#-detailed-feature-set)
    - [🎥 Video Player](#-video-player)
    - [🎵 Music & Audio Player](#-music--audio-player)
    - [📺 IPTV / Live TV](#-iptv--live-tv)
@@ -48,25 +49,25 @@
    - [🪟 Glassmorphism UI Kit](#-glassmorphism-ui-kit)
    - [🗂️ Media Library](#-media-library)
    - [⚙️ Settings & Customization](#-settings--customization)
-6. [Screenshots](#-screenshots)
-7. [Architecture](#-architecture)
-8. [Tech Stack](#-tech-stack)
-9. [Project Structure](#-project-structure)
-10. [Getting Started](#-getting-started)
-11. [Building from Source](#-building-from-source)
-12. [Development](#-development)
-13. [Permissions Explained](#-permissions-explained)
-14. [Privacy & Security](#-privacy--security)
-15. [Internationalization](#-internationalization)
-16. [Contributing](#-contributing)
-17. [Code of Conduct](#-code-of-conduct)
-18. [Security Policy](#-security-policy)
-19. [License](#-license)
-20. [Credits & Acknowledgements](#-credits--acknowledgements)
-21. [Support the Project](#-support-the-project)
-22. [Community](#-community)
-23. [FAQ](#-faq)
-24. [Roadmap](#-roadmap)
+7. [Screenshots](#-screenshots)
+8. [Architecture](#-architecture)
+9. [Tech Stack](#-tech-stack)
+10. [Project Structure](#-project-structure)
+11. [Getting Started](#-getting-started)
+12. [Building from Source](#-building-from-source)
+13. [Development](#-development)
+14. [Permissions Explained](#-permissions-explained)
+15. [Privacy & Security](#-privacy--security)
+16. [Internationalization](#-internationalization)
+17. [Contributing](#-contributing)
+18. [Code of Conduct](#-code-of-conduct)
+19. [Security Policy](#-security-policy)
+20. [License](#-license)
+21. [Credits & Acknowledgements](#-credits--acknowledgements)
+22. [Support the Project](#-support-the-project)
+23. [Community](#-community)
+24. [FAQ](#-faq)
+25. [Roadmap](#-roadmap)
 
 ---
 
@@ -75,20 +76,61 @@
 **SHS Player** is a free, open-source, ad-free Android multimedia application that plays local and network video, audio, and live IPTV streams. It is a heavily-extended fork of [Next Player](https://github.com/anilbeesetti/nextplayer) by Anil Kumar Beesetti, re-architected and rebranded by **Sajjad Hussain Shobuj (SHS)** with a focus on three pillars:
 
 - **Privacy-first design** — all media processing happens on-device. No tracking, no telemetry, no ads.
-- **Maximum format coverage** — ships *two* playback engines (AndroidX Media3/ExoPlayer **and** LibVLC) so virtually every container, codec, and streaming protocol "just works".
+- **Maximum format coverage** — ships *two* playback engines (**LibVLC** as default + AndroidX Media3/ExoPlayer as fallback) so virtually every container, codec, and streaming protocol "just works".
 - **Power-user features** — Privacy Vault, Wi-Fi file transfer, IPTV browsing, voice changer, AB-repeat, sleep timer, bookmarks, online subtitle search, video trim, and much more.
 
 The app is written in **100% Kotlin** with **Jetpack Compose** for the entire UI layer, follows **Clean Architecture** across **12 Gradle modules**, uses **Hilt** for dependency injection, **Room** + **DataStore** for persistence, and is localised into **40+ languages**.
 
-> **Latest version:** `0.16.0` (versionCode `55`) — [Download APK](https://github.com/The-JDdev/SHS-Player/releases/tag/v0.16.0)
+> **Latest version:** `0.17.0` (versionCode `58`) — [Download APK](https://github.com/The-JDdev/SHS-Player/releases)
 > **Min Android:** 6.0 (API 23) · **Target:** Android 16 (API 36)
 > **Application ID:** `dev.anilbeesetti.nextplayer` (retained for upstream compatibility)
 
 ---
 
+## 🆕 What's New in v0.17.0 (LibVLC Default + Bug Fix Release)
+
+v0.17.0 promotes **LibVLC to the primary default playback engine** and fixes five critical bugs that affected audio quality, seek accuracy, surface rendering, and media memory management in the VLC engine path.
+
+### 🔧 Bug Fixes (5 critical)
+
+| # | Component | Bug | Fix |
+|:---:|---|---|---|
+| **1** | `PlayerActivity` / ExoPlayer | `SeekParameters.EXACT` no longer exists in Media3 1.9.x — caused `NoSuchFieldError` crash on seek | Replaced with `SeekParameters(0L, 0L)` (zero tolerance, exact-seek semantics) |
+| **2** | `DelayAudioProcessor` | Original `queueInput()` attempted to read-and-shift the internal `ByteBuffer` in place — caused `BufferUnderflowException` + garbled audio | Full rewrite: drains input → allocates fresh output buffer → writes delay-filled silence or passthrough samples correctly |
+| **3** | `AudioDelayState` | Double milliseconds→microseconds conversion: delay was multiplied by 1000 twice, giving 1000× the intended value (3-second delay became 50-minute delay) | Remove one conversion stage; apply a single `delayMs * 1000L` for VLC's microsecond API |
+| **4** | `VlcEngine.setSurface()` | Called `media.setHWDecoderEnabled(true, false)` on a null `media` reference when invoked before `setDataSource()` — caused `NullPointerException` black screen | Added `?: return` null guard before hardware-decoder configuration |
+| **5** | `VlcPlayerEngine` media leak | `setDataSource()` released the old `Media` object but did not call `player.media = null`, leaving a dangling LibVLC reference and a native memory leak | Explicitly set `player.media = null` after `oldMedia.release()` |
+
+### 🚀 LibVLC as Default Engine (Phase 7 Promotion)
+
+Starting in v0.17.0, **every video intent is handled by `VlcPlayerActivity`** — a fully rewritten, Jetpack Compose-native player UI:
+
+- **All video `ACTION_VIEW` / `ACTION_SEND` intents** now route through `PlayerActivity.onCreate()` Phase 7 block, which immediately forwards them to `VlcPlayerActivity` before ExoPlayer initializes.
+- **`VlcPlayerActivity`** is a fully self-contained Compose UI with:
+  - Gesture layer: **horizontal drag** → seek (±10 % per drag), **left vertical drag** → brightness, **right vertical drag** → volume, **double-tap left/right** → ±10 s seek
+  - Semi-transparent overlay with **play/pause**, **seek bar** with current/total timestamps, **back button**, and **title**
+  - Auto-hide controls (5-second timer, resets on any touch)
+  - **Audio delay dialog** (±3000 ms slider, 100 ms steps, OK/Cancel)
+  - **Picture-in-Picture** (`enterPictureInPictureMode`) with aspect-ratio-safe rational
+  - **Background playback** via `VlcPlaybackService` (foreground service with `MediaSessionCompat` notification, play/pause/stop actions)
+- **`VlcPlaybackService`** — a dedicated foreground service using `MediaSessionCompat` (not Media3) for the system notification:
+  - `NOTIFICATION_ID = 1002` (separate from ExoPlayer's 1001)
+  - Playlist-aware with next/prev support
+  - Auto-stops when playback ends or the user dismisses the notification
+- **`AndroidManifest.xml`** — `VlcPlaybackService` registered with `foregroundServiceType="mediaPlayback"` for Android 14+ compliance.
+- ExoPlayer (`PlayerActivity`) remains available as a **fallback** for edge cases where no URI is present or for explicit ExoPlayer decoder-priority testing.
+
+### 📦 Build stats
+
+- versionCode `55` → `58`, versionName `0.16.0` → `0.17.0`
+- 7 files modified (5 bug-fix commits + 2 architecture commits)
+- 0 new external dependencies
+
+---
+
 ## 🆕 What's New in v0.16.0 (8-Phase Overhaul)
 
-v0.16.0 is the biggest release in the project's history — a single 8-phase master overhaul that touches the UI layer, audio engine, secret vault, network streaming, intent capture, video player core, P2P UX, and Live TV.
+v0.16.0 was the biggest release in the project's history — a single 8-phase master overhaul that touches the UI layer, audio engine, secret vault, network streaming, intent capture, video player core, P2P UX, and Live TV.
 
 | Phase | Headline change | Key files |
 |:---:|---|---|
@@ -103,8 +145,6 @@ v0.16.0 is the biggest release in the project's history — a single 8-phase mas
 
 **Build stats:** 17 files modified, 8 new files added, ~944 LOC additions across 12 modules. Built on Kotlin 2.3.0, AGP 8.13.2, Media3 1.9.2, LibVLC 3.6.0-eap5, Room 2.8.4 (v5 schema).
 
-See the [v0.16.0 release notes](https://github.com/The-JDdev/SHS-Player/releases/tag/v0.16.0) for the full changelog.
-
 ---
 
 ## 🔥 Why SHS Player?
@@ -113,7 +153,7 @@ Most Android players fall into two camps: feature-rich but bloated/proprietary (
 
 | Capability | SHS Player | Next Player | VLC | MX Player |
 |---|:---:|:---:|:---:|:---:|
-| Dual engine (Media3 + VLC) | ✅ | ❌ | VLC only | Proprietary |
+| Dual engine (LibVLC primary + Media3 fallback) | ✅ | ❌ | VLC only | Proprietary |
 | Privacy Vault (encrypted on-device) | ✅ | ❌ | ❌ | ❌ |
 | Wi-Fi file transfer (no internet) | ✅ | ❌ | ❌ | ❌ |
 | IPTV / M3U live TV browser | ✅ | ❌ | ⚠️ (manual) | ❌ |
@@ -135,11 +175,11 @@ SHS Player inherits Next Player's entire codebase (Media3 player, Material 3 UI,
 
 - **New top-level navigation** — a 5-tab bottom bar (Videos · Music · Watch TV · Me · Telegram) instead of a single Videos screen.
 - **A separate Music library** with files / folders / favourites / recent / playlists tabs and a dedicated audio player activity.
-- **An IPTV module** that bundles 8 free iptv-org playlists and parses any `.m3u` URL.
+- **An IPTV module** that bundles 8+ free iptv-org playlists and parses any `.m3u` URL.
 - **A Privacy Vault** that moves media into app-private storage behind a SHA-256 password and optional biometric unlock.
 - **A Wi-Fi file transfer server** (NanoHTTPD) that lets you push/pull files from any browser on the same LAN — no internet, no cloud.
 - **A QR scanner** (CameraX + MLKit) and a TrebleShot-compatible QR share format for direct device-to-device transfers.
-- **A VLC engine** for files / streams / codecs that ExoPlayer can't handle.
+- **LibVLC 3.6.0-eap5 as the primary engine** — handles the long tail of codecs, containers, and stream protocols that ExoPlayer can't.
 - **Voice changer, AB-repeat, sleep timer, bookmarks, favourites, video trim, video→audio, reverse play, screenshot, mirror, audio delay** in the player.
 - **Online subtitle search** via OpenSubtitles (hardcoded API key).
 - **Volume boost up to 200%** via `LoudnessEnhancer`.
@@ -157,22 +197,42 @@ SHS Player inherits Next Player's entire codebase (Media3 player, Material 3 UI,
 The video player is the heart of SHS Player and the most feature-dense module in the project.
 
 **Engines**
-- **AndroidX Media3 / ExoPlayer 1.9.2** (default) — supports DASH, HLS, RTSP, SmoothStreaming, and every codec Android ships natively (H.263, H.264, H.265/HEVC, MPEG-4, VP8, VP9, AV1).
-- **LibVLC 3.6.0-eap5** (fallback) — for files/streams/codecs that ExoPlayer can't handle. Configured with `:input-fast-seek`, `--no-drop-late-frames`, hardware acceleration with software fallback, and network caching. VLC also provides sample-accurate audio delay (microsecond precision) and a native 10-band equalizer that ExoPlayer can't match.
+- **LibVLC 3.6.0-eap5** ⭐ **(PRIMARY DEFAULT)** — all video intents are now routed to `VlcPlayerActivity`. Configured with `:input-fast-seek`, `--no-drop-late-frames`, hardware acceleration with software fallback, and network caching. VLC provides sample-accurate audio delay (microsecond precision), a native 10-band equalizer, and handles virtually every container and codec.
+- **AndroidX Media3 / ExoPlayer 1.9.2** *(fallback)* — available via `PlayerActivity` for DASH, HLS, RTSP, SmoothStreaming, and files/streams that need Android's native codec pipeline. Falls back seamlessly when no URI is provided to `VlcPlayerActivity`.
 
-**Playback controls**
-- Play / pause / seek bar with 10-second seek increments (configurable 1–60 s) and previous-sync seek parameters.
+**`VlcPlayerActivity` — Full Compose Player UI**
+
+Introduced as the primary player in v0.17.0. Entirely written in Jetpack Compose:
+
+- **Gesture layer** (draggable transparent overlay over the `AndroidView` surface):
+  - **Horizontal drag** → seek (±10% of duration per full-width drag)
+  - **Left vertical drag** → brightness (0–100%, persisted across sessions if "Remember brightness" is on)
+  - **Right vertical drag** → volume (0–100%, system audio stream)
+  - **Double-tap left zone** → rewind 10 s
+  - **Double-tap right zone** → fast-forward 10 s
+- **Controls overlay** (semi-transparent, auto-hides after 5 s):
+  - Back arrow, video title
+  - Play / Pause button
+  - Seek bar with elapsed / total timestamps
+  - Audio delay button → opens `AudioDelayDialog` (slider ±3000 ms, 100 ms steps)
+  - PiP button → `enterPictureInPictureMode()` with safe aspect-ratio rational
+- **Picture-in-Picture** — enters PiP on `onUserLeaveHint` and on explicit button tap; aspect ratio clamped to `[1/2.39, 2.39/1]` to satisfy Android's `IllegalArgumentException`.
+- **Background playback** — connects to `VlcPlaybackService` on `onStart` / disconnects on `onStop`; the foreground service keeps audio alive when the screen is off.
+- **SurfaceView lifecycle** — uses `AndroidView { SurfaceView }` with a `SurfaceHolder.Callback` that calls `VlcPlayerEngine.setSurface(holder)` only after the surface is created (guards against the null-media crash fixed in v0.17.0 bug #4).
+
+**Playback controls** (shared across both engines)
+- Play / pause / seek bar with 10-second seek increments (configurable 1–60 s).
 - Fast seek with configurable threshold.
-- Skip silence (Media3's `setSkipSilenceEnabled`).
+- Skip silence (`setSkipSilenceEnabled` in ExoPlayer; VLC handles natively).
 - Long-press to fast-forward at a configurable speed (0.2×–4.0×).
-- Background playback with a branded media notification (`NOTIFICATION_ID = 1001` for ExoPlayer, `1002` for VLC).
+- Background playback with branded media notification.
 - Picture-in-Picture with custom `RemoteAction`s and 32-bit-safe aspect-ratio coercion.
 - Loop modes: off / loop all / loop one.
 - Shuffle.
 
 **Audio features**
-- **Audio track selector** — pick any embedded audio track; remembers your last selection per file.
-- **Audio delay / sync** — offset audio by −3000 ms to +3000 ms (VLC gives microsecond precision).
+- **Audio track selector** — pick any embedded audio track; remembers last selection per file.
+- **Audio delay / sync** — offset audio by −3000 ms to +3000 ms (VLC gives microsecond precision; fixed in v0.17.0 bug #2 and #3).
 - **5/10-band audio equalizer** — uses Android's native `android.media.audiofx.Equalizer`. Save and load EQ profiles.
 - **Voice changer** — 5 pitch presets (chipmunk, deep, robot, etc.) via `PlaybackParameters(pitch)`.
 - **Volume boost up to 200%** via `LoudnessEnhancer`.
@@ -251,9 +311,10 @@ A full IPTV browser (`WatchTvScreen` + `M3uParser`):
 - **M3U parser** handles `http`, `content`, and `file` sources; extracts `tvg-logo`, `group-title`, `tvg-id`, `tvg-name`.
 - Supports `http`, `rtmp`, `rtsp`, and `udp` stream URLs.
 - Sends User-Agent `SHSPlayer/1.4` for streams that require it.
-- **Ships with 8 free iptv-org playlists** baked in: USA, India, UK, Sports, News, Movies, Kids, Music.
+- **Ships with 8+ free iptv-org playlists** baked in: USA, India, UK, Sports, News, Movies, Kids, Music.
 - **Searchable & grouped** by `group-title`.
-- **Launches into `PlayerActivity`** for full-screen playback.
+- **Category tabs** — Bangladesh · Sports · News · Popular · Free Channels (heuristic resolver maps groups to tabs).
+- **Launches into `VlcPlayerActivity`** for full-screen IPTV stream playback (benefits from VLC's superior RTSP/HLS/UDP support).
 - Add your own `.m3u` URL or local file at runtime.
 
 ---
@@ -396,8 +457,9 @@ SHS Player follows **Clean Architecture** across **12 Gradle modules**, with str
             ▼                  ▼                  ▼
    ┌─────────────────┐ ┌──────────────┐ ┌────────────────┐
    │ :feature:player │ │:feature:settings│ │:feature:videopicker│
-   │ ExoPlayer + VLC │ │ 8 pref screens │ │ Library browser   │
-   │ 17 state holders│ │ ViewModels     │ │ Selection, sort   │
+   │ LibVLC(primary) │ │ 8 pref screens │ │ Library browser   │
+   │ + ExoPlayer(fb) │ │ ViewModels     │ │ Selection, sort   │
+   │ 17 state holders│ │                │ │                   │
    └────────┬────────┘ └───────┬────────┘ └────────┬────────┘
             └──────────────────┴──────────────────┘
                                │
@@ -421,7 +483,7 @@ SHS Player follows **Clean Architecture** across **12 Gradle modules**, with str
 **Key patterns**
 - **Hilt 2.57.2** for DI across every module except `core:model` and `core:ui`.
 - **ViewModel + StateFlow** for screen state; **`@Stable` Compose state holders** for player state (17 of them in `feature:player`).
-- **Single-Activity architecture** — `MainActivity` hosts a Compose `NavHost`; `PlayerActivity` and `AudioPlayerActivity` are the only other activities.
+- **Single-Activity architecture** — `MainActivity` hosts a Compose `NavHost`; `VlcPlayerActivity`, `PlayerActivity`, and `AudioPlayerActivity` are separate full-screen activities.
 - **Repository pattern** — `MediaRepository` and `PreferencesRepository` interfaces in `core:data` with `Local*` implementations bound via Hilt.
 - **Use-case layer** — `core/domain` has 5 use cases that compose the three sorters + folder-tree builder + playlist builder.
 - **DataStore with typed JSON serializers** — `ApplicationPreferences` and `PlayerPreferences` are `@Serializable` data classes persisted via `DataStoreFactory.create` with custom `Serializer` and `Json { ignoreUnknownKeys = true }`.
@@ -448,8 +510,8 @@ SHS Player follows **Clean Architecture** across **12 Gradle modules**, with str
 | **DI** | Hilt | 2.57.2 |
 | **Persistence** | Room | 2.8.4 |
 | **Persistence** | DataStore | 1.2.0 |
-| **Playback** | AndroidX Media3 | 1.9.2 (common, exoplayer, dash, hls, rtsp, session, ui, ui-compose) |
-| **Playback** | LibVLC | 3.6.0-eap5 |
+| **Playback** | LibVLC ⭐ **(Primary)** | 3.6.0-eap5 |
+| **Playback** | AndroidX Media3 (ExoPlayer, DASH, HLS, RTSP, Session, UI) | 1.9.2 |
 | **Camera** | CameraX | 1.4.1 (core, camera2, lifecycle, view) |
 | **ML** | MLKit Barcode Scanning | 17.3.0 |
 | **QR** | ZXing | 3.5.3 |
@@ -503,364 +565,149 @@ SHS-Player/
 │               │   └── M3uParser.kt        # M3U parser
 │               └── share/
 │                   ├── QrShareFormat.kt    # TrebleShot-compatible QR format
-│                   └── HotspotManager.kt   # LocalOnlyHotspot + PIN
-│
-├── core/                                   # 8 core modules
-│   ├── common/                             # Logger, Utils, Dispatchers, extensions
-│   │   └── src/main/java/.../core/common/
-│   │       ├── Logger.kt, Utils.kt, NextDispatchers.kt
-│   │       ├── extensions/ (Float, File, Uri, Context)
-│   │       └── di/ (CoroutineScopesModule, DispatchersModule)
-│   ├── model/                              # 21 @Serializable pure-Kotlin types
-│   │   └── src/main/java/.../core/model/
-│   │       ├── ApplicationPreferences.kt, PlayerPreferences.kt
-│   │       ├── Video.kt, Folder.kt, Sort.kt
-│   │       ├── ThemeConfig.kt, DecoderPriority.kt, ScreenOrientation.kt
-│   │       ├── VideoContentScale.kt, MediaViewMode.kt, MediaLayoutMode.kt
-│   │       ├── Font.kt, FastSeek.kt, Resume.kt, LoopMode.kt
-│   │       ├── DoubleTapGesture.kt, ControlButtonsPosition.kt
-│   │       └── VideoStreamInfo.kt, AudioStreamInfo.kt, SubtitleStreamInfo.kt
-│   ├── database/                           # Room v4 — 8 entities, 5 DAOs, 3 migrations
-│   │   ├── schemas/ (4 exported JSON schemas v1–v4)
-│   │   └── src/main/java/.../core/database/
-│   │       ├── MediaDatabase.kt, DatabaseModule.kt, DaoModule.kt
-│   │       ├── dao/ (MediumDao, MediumStateDao, DirectoryDao, BookmarkDao, FavoriteDao)
-│   │       ├── entities/ (MediumEntity, MediumStateEntity, DirectoryEntity,
-│   │       │            VideoStreamInfoEntity, AudioStreamInfoEntity, SubtitleStreamInfoEntity,
-│   │       │            BookmarkEntity, FavoriteEntity)
-│   │       ├── relations/ (MediumWithInfo, DirectoryWithMedia)
-│   │       ├── converter/UriListConverter.kt
-│   │       └── src/androidTest/.../dao/ (MediumDaoTest, DirectoryDaoTest)
-│   ├── datastore/                          # Typed JSON DataStore
-│   │   └── src/main/java/.../core/datastore/
-│   │       ├── datasource/ (PreferencesDataSource, AppPreferencesDataSource, PlayerPreferencesDataSource)
-│   │       ├── serializer/ (ApplicationPreferencesSerializer, PlayerPreferencesSerializer)
-│   │       └── di/DataStoreModule.kt
-│   ├── data/                               # Repositories + mappers
-│   │   └── src/main/java/.../core/data/
-│   │       ├── DataModule.kt
-│   │       ├── repository/ (MediaRepository, LocalMediaRepository,
-│   │       │               PreferencesRepository, LocalPreferencesRepository,
-│   │       │               fake/FakeMediaRepository, fake/FakePreferencesRepository)
-│   │       ├── mappers/ (ToVideo, ToFolder, ToVideoState, ToVideoStreamInfo,
-│   │       │             ToAudioStreamInfo, ToSubtitleStreamInfo)
-│   │       └── models/VideoState.kt
-│   ├── domain/                             # 5 use cases
-│   │   └── src/main/java/.../core/domain/
-│   │       ├── GetSortedMediaUseCase.kt
-│   │       ├── GetSortedVideosUseCase.kt
-│   │       ├── GetSortedFoldersUseCase.kt
-│   │       ├── GetSortedFolderTreeUseCase.kt
-│   │       ├── GetSortedPlaylistUseCase.kt
-│   │       └── src/test/.../GetSortedVideosUseCaseTest.kt  # 8 tests, all Sort × Order combos
-│   ├── media/                              # MediaStore sync + MediaMetadataRetriever
-│   │   └── src/main/java/.../core/media/
-│   │       ├── MediaModule.kt
-│   │       ├── model/MediaVideo.kt
-│   │       ├── services/ (MediaService, LocalMediaService)
-│   │       └── sync/ (MediaSynchronizer, LocalMediaSynchronizer,
-│   │                  MediaInfoSynchronizer, LocalMediaInfoSynchronizer)
-│   └── ui/                                 # Compose-only component library
-│       └── src/main/java/.../core/ui/
-│           ├── theme/ (Theme.kt, Color.kt, Type.kt)
-│           ├── designsystem/NextIcons.kt
-│           ├── base/ (ScreenState, DataState)
-│           ├── components/ (PreferenceItem, ClickablePreferenceItem, PreferenceSwitch,
-│           │                 PreferenceSwitchWithDivider, PreferenceSlider, NextSwitch,
-│           │                 RadioTextButton, Buttons, NextDialog, TopAppBar, ListItemComponent,
-│           │                 ClickablePreferenceItem)
-│           ├── composables/ (PermissionRationaleDialog, PermissionDetailView,
-│           │                  PermissionMissingView, FastScroll)
-│           ├── preview/ (DevicePreviews, DayNightPreview, VideoPickerPreviewParameterProvider)
-│           ├── extensions/PaddingValues.kt
-│           └── res/
-│               ├── drawable/ (72 icon XMLs + ic_shs_icon.jpg + ic_developer_photo.png)
-│               ├── values/ (strings.xml, colors.xml, dimens.xml, arrays.xml, themes.xml)
-│               └── values-*/  (40 locale folders: ar, bg, bn, ca, cs, da, de, el, es, et,
-│                                fa, fi, fr, hi, hu, ia, in, it, iw, ja, kn, ko, ml, nb-rNO,
-│                                nl, pa, pl, pt, pt-rBR, ro, ru, sv, ta, th, tr, uk, ur, vi,
-│                                zh-rCN, zh-rTW)
-│
-├── feature/                                # 3 feature modules
-│   ├── player/                             # The big one — ExoPlayer + VLC + 17 state holders
-│   │   ├── build.gradle.kts
-│   │   └── src/main/java/.../feature/player/
-│   │       ├── PlayerActivity.kt           # Video host
-│   │       ├── AudioPlayerActivity.kt      # Audio host (separate, leak-fixed)
-│   │       ├── PlayerViewModel.kt
-│   │       ├── MediaPlayerScreen.kt        # Orchestrates 13 state holders + 12 overlays
-│   │       ├── AudioPlayerScreen.kt
-│   │       ├── PlayerContentFrame.kt
-│   │       ├── engine/                     # ← VLC engine (unique to SHS Player)
-│   │       │   ├── VlcEngine.kt
-│   │       │   ├── VlcPlayerEngine.kt
-│   │       │   ├── VlcPlayerActivity.kt
-│   │       │   └── VlcPlaybackService.kt
-│   │       ├── service/
-│   │       │   ├── PlayerService.kt        # MediaSessionService (ExoPlayer)
-│   │       │   └── CustomCommands.kt       # 6 SessionCommands
-│   │       ├── state/                      # 17 @Stable Compose state holders
-│   │       │   ├── TapGestureState.kt, AudioEqualizerState.kt, VolumeState.kt,
-│   │       │   ├── MediaPresentationState.kt, CuesState.kt, PlaybackParametersState.kt,
-│   │       │   ├── SeekGestureState.kt, BrightnessState.kt, ControlsVisibilityState.kt,
-│   │       │   ├── MetadataState.kt, AudioDelayState.kt, VideoZoomAndContentScaleState.kt,
-│   │       │   ├── TracksState.kt, ErrorState.kt, RotationState.kt,
-│   │       │   ├── VolumeAndBrightnessGestureState.kt, PictureInPictureState.kt,
-│   │       │   └── VideoEqualizerState.kt
-│   │       ├── ui/                         # 20+ player UI panels
-│   │       │   ├── EqualizerView.kt, SleepTimerView.kt, AbRepeatView.kt,
-│   │       │   ├── SubtitleView.kt, VideoContentScaleSelectorView.kt,
-│   │       │   ├── PlaybackSpeedSelectorView.kt, VoiceChangerView.kt,
-│   │       │   ├── VerticalProgressView.kt, DecoderSelectorView.kt,
-│   │       │   ├── AudioTrackSelectorView.kt, OverlayShowView.kt,
-│   │       │   ├── DoubleTapIndicator.kt, PlaylistPanelView.kt, PlayerGestures.kt,
-│   │       │   ├── RadioButtonRow.kt, SubtitleSelectorView.kt, BookmarkView.kt,
-│   │       │   ├── PlayerMenuView.kt, OverlayView.kt, ShutterView.kt
-│   │       │   └── controls/ (ControlsTopView, ControlsBottomView,
-│   │       │                 CustomizablePlayerControlsRow)
-│   │       ├── buttons/ (PlayPauseButton, PreviousButton, NextButton,
-│   │       │              RepeatButton, ShuffleButton, PlayerButton)
-│   │       ├── extensions/ (Player, PlayerView, MediaItem, Uri, Duration, Font,
-│   │       │                 Enum, Activity, Modifier, ImageButton, PointerInputScope,
-│   │       │                 Rational, ScreenOrientation, SuspendActivityResultLauncher,
-│   │       │                 TrackGroup, MappedTrackInfo, VideoSize, VideoContentScale)
-│   │       ├── utils/ (PlayerApi.kt, ScreenshotUtil.kt)
-│   │       └── model/Subtitle.kt
-│   │
-│   ├── settings/                           # 8 settings screens + navigation
-│   │   └── src/main/java/.../settings/
-│   │       ├── SettingsScreen.kt
-│   │       ├── screens/
-│   │       │   ├── audio/ (AudioPreferencesScreen, AudioPreferencesViewModel)
-│   │       │   ├── about/ (AboutPreferencesScreen, LibrariesScreen)
-│   │       │   ├── medialibrary/ (FolderPreferencesScreen, FolderPreferencesViewModel,
-│   │       │   │                          MediaLibraryPreferencesScreen, MediaLibraryPreferencesViewModel)
-│   │       │   ├── appearance/ (AppearancePreferencesScreen, AppearancePreferencesViewModel)
-│   │       │   ├── general/ (GeneralPreferencesScreen, GeneralPreferencesViewModel)
-│   │       │   ├── player/ (PlayerPreferencesScreen, PlayerPreferencesViewModel)
-│   │       │   ├── subtitle/ (SubtitlePreferencesScreen, SubtitlePreferencesViewModel)
-│   │       │   └── decoder/ (DecoderPreferencesScreen, DecoderPreferencesViewModel)
-│   │       ├── navigation/ (9 NavGraph extensions)
-│   │       ├── extensions/ (FastSeek, Font, ControlButtonsPosition, Resume,
-│   │       │                 DoubleTapGesture, ScreenOrientation, ThemeConfig, DecoderPriority)
-│   │       ├── composables/OptionsDialog.kt
-│   │       └── utils/LocalesHelper.kt
-│   │
-│   └── videopicker/                        # Library browser
-│       └── src/main/java/.../feature/videopicker/
-│           ├── screens/
-│           │   ├── mediapicker/ (MediaPickerScreen, MediaPickerViewModel)
-│           │   └── MediaState.kt
-│           ├── navigation/MediaPickerNavigation.kt
-│           ├── extensions/ (MediaViewMode, SortOrder, MediaLayoutMode)
-│           ├── state/SelectionManager.kt
-│           └── composables/ (MediaView, FolderItem, RenameDialog, VideoInfoDialog,
-│                             VideoItem, QuickSettingsDialog, MediaContent,
-│                             TextIconToggleButton, InfoChip)
-│
-├── fastlane/                               # Play Store automation
-│   ├── Appfile, Fastfile, README.md
-│   └── metadata/android/en-US/
-│       ├── title.txt, short_description.txt, full_description.txt
-│       ├── changelogs/ (18, 19, 20, 29, 31)
-│       └── images/ (featureGraphic, icon, 7 phoneScreenshots)
-│
+│                   ├── HotspotManager.kt   # WifiManager.startLocalOnlyHotspot wrapper
+│                   └── P2pPermissionSetupCard.kt
+├── feature/
+│   ├── player/                             # Player module
+│   │   └── src/main/java/.../player/
+│   │       ├── PlayerActivity.kt           # ExoPlayer host (fallback)
+│   │       ├── AudioPlayerActivity.kt      # Audio-only player
+│   │       ├── AudioPlayerScreen.kt        # Vinyl UI
+│   │       └── engine/
+│   │           ├── VlcPlayerActivity.kt    # ⭐ PRIMARY player (Compose UI + LibVLC)
+│   │           ├── VlcPlayerEngine.kt      # LibVLC wrapper
+│   │           ├── VlcPlaybackService.kt   # Foreground service (MediaSessionCompat)
+│   │           └── ExoPlayerEngine.kt
+│   ├── settings/                           # 8 settings screens
+│   └── videopicker/                        # Media library browser
+├── core/
+│   ├── common/                             # Utilities, Logger, Dispatchers
+│   ├── data/                               # Repositories, mappers
+│   ├── database/                           # Room DB, DAOs, migrations
+│   ├── datastore/                          # DataStore, serializers
+│   ├── domain/                             # Use cases
+│   ├── media/                              # MediaStore sync, MediaService
+│   ├── model/                              # Pure Kotlin @Serializable types
+│   └── ui/                                 # Theme, components, Glass UI kit
 ├── gradle/
-│   ├── libs.versions.toml                  # Version catalog
-│   └── wrapper/ (gradle-wrapper.jar, gradle-wrapper.properties)
-│
-├── build.gradle.kts                        # Root build (ktlint + aboutlibraries everywhere)
-├── settings.gradle.kts                     # rootProject.name = "SHSPlayer"
-├── gradle.properties
-├── gradlew, gradlew.bat
-├── Gemfile                                 # fastlane gem
-├── renovate.json                           # Renovate config
-├── index.html                              # GitHub Pages landing page
-├── LICENSE                                 # MIT
-├── PRIVACY                                 # Privacy policy
-├── CODE_OF_CONDUCT.md
+│   ├── libs.versions.toml                  # Version catalog (single source of truth)
+│   └── wrapper/
+├── fastlane/                               # Fastlane metadata + Play Store screenshots
 ├── CONTRIBUTING.md
-└── SECURITY.md
+├── CODE_OF_CONDUCT.md
+├── SECURITY.md
+├── LICENSE
+└── README.md
 ```
 
 ---
 
-## 🎯 Getting Started
+## 🏁 Getting Started
 
-### For end users
+### Requirements
+- **Android 6.0 (API 23)** or higher
+- Storage permission (READ_EXTERNAL_STORAGE on API 28 and below; READ_MEDIA_VIDEO + READ_MEDIA_AUDIO on API 33+)
 
-1. **Download the latest APK** from the [Releases page](https://github.com/The-JDdev/SHS-Player/releases).
-2. Allow "Install from unknown sources" for your browser/file manager.
-3. Open the APK and install.
-4. Launch **SHS Player** and grant the media-permission prompt on first run.
+### Install
+1. Download the correct APK from the [Releases page](https://github.com/The-JDdev/SHS-Player/releases).
+2. Enable **Install unknown apps** for your browser in Android settings.
+3. Install and launch.
 
-> **Android 13+:** Only `READ_MEDIA_VIDEO` / `READ_MEDIA_AUDIO` are requested.  
-> **Android 12 and below:** `READ_EXTERNAL_STORAGE` (and `WRITE_EXTERNAL_STORAGE` on Android 10 and below).  
-> **Privacy Vault** uses app-private storage — no extra permission needed.
+No account, login, or internet connection required.
 
 ---
 
-## 🔧 Building from Source
-
-### Prerequisites
-
-- **JDK 17** (set `JAVA_HOME`)
-- **Android SDK** with `platform-android-36` and `build-tools` matching AGP 8.13.2
-- **Android NDK** is *not* required — VLC ships pre-built `.so` files for all 4 ABIs.
-- **Git**, **Python 3** (for fastlane, optional)
-- ~6 GB free disk space for Gradle caches and build outputs
-
-### Clone & build
+## 🛠 Building from Source
 
 ```bash
-# Clone
+# Clone the repository
 git clone https://github.com/The-JDdev/SHS-Player.git
 cd SHS-Player
 
-# Build a debug APK (universal)
+# Build a debug APK (per-ABI)
 ./gradlew assembleDebug
 
-# Build release APKs (per-ABI splits + universal)
-./gradlew assembleRelease
+# Build a universal debug APK
+./gradlew assembleDebug -PABI=universal
 
-# Build an App Bundle (.aab) for Play Store
-./gradlew bundleRelease
+# Build a release-with-debug-signing APK (same R8 shrinking as release, debug keystore)
+./gradlew assembleRelease-with-debug-signing
 
-# Or use Fastlane
-bundle install                      # one-time
-bundle exec fastlane build          # builds release APK + AAB
+# Run ktlint check
+./gradlew ktlintCheck
+
+# Auto-fix ktlint violations
+./gradlew ktlintFormat
 ```
 
-### Build variants
+> **Note:** The release build type (`assembleRelease`) requires a production signing key. The `release-with-debug-signing` build type uses the committed `app/debug.keystore` for CI and community builds.
 
-| Variant | Application ID suffix | Signature | Notes |
-|---|---|---|---|
-| `debug` | `.debug` | Debug keystore (committed) | App name shows "SHS Player"; debuggable. |
-| `release` | — | Your own keystore | R8 minify + resource shrink. Set up a `release` signing config in `app/build.gradle.kts` or pass via Fastlane env vars. |
-| `release-with-debug-signing` | `.release` | Debug keystore | Same as `release` but signed with the debug key — useful for testing R8 on a real device without setting up release signing. |
-
-### ABI splits
-
-Release builds split into per-ABI APKs (smaller download size):
-- `armeabi-v7a` (32-bit ARM — old devices)
-- `arm64-v8a` (64-bit ARM — modern phones)
-- `x86` (32-bit Intel/AMD — emulator)
-- `x86_64` (64-bit Intel/AMD — emulator / Chromebook)
-- `universal` (everything in one APK)
-
-App Bundles (`bundleRelease`) disable the splits and let Google Play handle per-device delivery.
-
-### Build outputs
-
-```
-app/build/outputs/apk/debug/app-debug.apk
-app/build/outputs/apk/release/app-arm64-v8a-release.apk
-app/build/outputs/apk/release/app-universal-release.apk
-app/build/outputs/bundle/release/app-release.aab
-```
+### JDK
+Requires **JDK 17**. Verify with `java -version`.
 
 ---
 
-## 🛠 Development
+## 💻 Development
 
-### Environment
+### IDE
+**Android Studio Meerkat (2024.3.1)** or newer, with the Kotlin plugin matching the project's Kotlin version (2.3.0).
 
-- **IDE:** Android Studio (Ladybug or newer) or IntelliJ IDEA with the Kotlin plugin
-- **Kotlin:** 2.3.0
-- **Gradle:** 9.3.1 (via wrapper — do not use a system Gradle)
-- **KSP:** 2.3.4 (matches Kotlin)
-- **Compose Compiler:** bundled with Kotlin 2.3.0 via `org.jetbrains.kotlin.plugin.compose`
+### Module graph
+The project has strict module boundaries. Run `./gradlew dependencies --configuration releaseRuntimeClasspath` in any module to inspect its dependency graph. Never add `feature:*` → `feature:*` edges.
+
+### Adding a new feature
+1. Put UI in the appropriate `feature:*` module.
+2. Put persistence (DAOs, entities) in `core:database`.
+3. Put models in `core:model` (no Android imports).
+4. Put business logic in `core:domain` (use cases) or `core:data` (repositories).
+5. Inject via Hilt; expose to Compose via ViewModel + StateFlow.
 
 ### Code style
-
-- **ktlint 12.3.0** is applied to every module via the root `build.gradle.kts`. Run:
-  ```bash
-  ./gradlew ktlintCheck       # check
-  ./gradlew ktlintFormat      # auto-format
-  ```
-- Follow the existing Compose conventions: `@Stable` state holders, `remember<State>()` + `LaunchedEffect(player) { state.observe() }`, `compositionLocalOf` for cross-tree state.
-- Use Hilt `@Inject` for constructor injection; never use field injection.
-- Keep modules decoupled — `feature:*` modules must not depend on each other; `core:*` modules must not depend on `feature:*`.
-
-### Tests
-
-```bash
-./gradlew test                         # JVM unit tests (core/domain has 8)
-./gradlew connectedAndroidTest         # Instrumented tests (core/database DAO tests)
-```
-
-Tests are configured with `ignoreFailures = true` at the root level — failures won't break the build, but please don't add broken tests.
-
-### Debugging tips
-
-- The **custom crash reporter** captures `logcat -d` at crash time and offers Share / Copy / Restart — useful when debugging on a device without ADB.
-- `core/common/Logger.kt` wraps `Log.d/i/e` — use it instead of raw `Log.*` so logs can be toggled centrally in the future.
-- `NextDispatchers` (`Default`, `IO`) is injected via Hilt — never use `Dispatchers.IO` directly in production code.
-- Room schema exports are in `core/database/schemas/` — if you change `MediaDatabase`, generate a new schema and write a migration (do **not** use `fallbackToDestructiveMigration`).
-
-### Fastlane
-
-The `fastlane/` folder automates Play Store publishing:
-
-```bash
-# Build (release APK + AAB)
-bundle exec fastlane build
-
-# Build + publish to Play Store Internal Track
-bundle exec fastlane publish track:internal
-```
-
-Environment variables for signing:
-- `KEYSTORE` — path to your `.keystore` / `.jks`
-- `KEYSTORE_PASSWORD`
-- `KEY_ALIAS`
-- `KEY_PASSWORD`
-- `PLAY_API_CREDENTIALS` — path to Play Store service-account JSON
+- `ktlint` 12.3.0. Run `./gradlew ktlintFormat` before committing.
+- No raw `System.out.println` — use `req.log` in handlers, `android.util.Log` in Activities, the project `Logger` in domain/data.
+- All new Compose screens must be `@Stable` or `@Immutable` for state holders.
 
 ---
 
 ## 🔐 Permissions Explained
 
-SHS Player requests **only the permissions it needs** — no contact list, no location (except for Wi-Fi peer discovery metadata, never stored), no SMS, no call log.
-
 | Permission | Why |
 |---|---|
-| `INTERNET` | Streaming (DASH/HLS/RTSP), online subtitle search, IPTV, Wi-Fi transfer server. |
-| `READ_MEDIA_VIDEO` / `READ_MEDIA_AUDIO` (Android 13+) | Read your video and audio files. |
-| `READ_EXTERNAL_STORAGE` (≤ Android 12) | Read media on older Android versions. |
-| `WRITE_EXTERNAL_STORAGE` (≤ Android 10) | Write to shared storage on pre-Scoped-Storage Android. |
-| `MANAGE_MEDIA` | Bulk delete media via `MediaStore.createDeleteRequest` flow on Android 11+. |
-| `SYSTEM_ALERT_WINDOW` | Picture-in-Picture overlay on older Android; future overlay features. |
-| `CAMERA` | QR scanner. |
-| `RECORD_AUDIO` | Reserved for future voice-input features (not currently active). |
-| `ACCESS_WIFI_STATE` / `CHANGE_WIFI_STATE` / `ACCESS_NETWORK_STATE` / `CHANGE_NETWORK_STATE` / `NEARBY_WIFI_DEVICES` (Android 13+) | Wi-Fi file transfer, local-only hotspot, device discovery. |
-| `ACCESS_FINE_LOCATION` / `ACCESS_COARSE_LOCATION` | Required by Android to expose Wi-Fi BSSID/SSID for the TrebleShot-style share format. **Never stored or transmitted.** |
-| `BLUETOOTH` / `BLUETOOTH_ADMIN` (≤ Android 11) / `BLUETOOTH_CONNECT` / `BLUETOOTH_SCAN` (Android 12+) | Reserved for future Bluetooth file transfer. |
-| `USE_BIOMETRIC` / `USE_FINGERPRINT` | Privacy Vault biometric unlock. |
+| `READ_MEDIA_VIDEO`, `READ_MEDIA_AUDIO` | Scan the device media library (API 33+) |
+| `READ_EXTERNAL_STORAGE` | Scan the device media library (API ≤ 32) |
+| `INTERNET` | IPTV stream playback, online subtitle search, yt-dlp binary auto-update |
+| `ACCESS_WIFI_STATE`, `ACCESS_NETWORK_STATE` | Wi-Fi file transfer server; detect network type |
+| `ACCESS_FINE_LOCATION` | Read SSID/BSSID for QR share format (Android requires location for Wi-Fi SSID) |
+| `CHANGE_WIFI_STATE` | Enable Wi-Fi for the file transfer server |
+| `CHANGE_NETWORK_STATE` | Manage network for hotspot mode |
+| `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK` | Background audio/video playback notification |
+| `USE_BIOMETRIC`, `USE_FINGERPRINT` | Privacy Vault biometric unlock |
+| `CAMERA` | QR scanner |
+| `RECEIVE_BOOT_COMPLETED` | (Media library reindex after reboot — optional) |
+| `VIBRATE` | Haptic feedback on selection actions |
+| `REQUEST_INSTALL_PACKAGES` | yt-dlp binary update (downloaded from GitHub) |
 
 ---
 
 ## 🛡 Privacy & Security
 
-- **No data collection.** SHS Player does not collect, transmit, or share any personal information. There is no analytics SDK, no crash-reporting SDK, no ad SDK.
-- **All processing is on-device.** Media decoding, thumbnail generation, subtitle parsing, charset detection, QR encoding — everything happens locally.
-- **Wi-Fi File Transfer stays on your LAN.** The NanoHTTPD server binds to your local Wi-Fi interface; there is no cloud relay.
-- **Privacy Vault files are stored in app-private storage** (`context.filesDir/vault/`) — invisible to other apps and to the gallery. They are deleted if you uninstall the app (so back them up first!).
-- **Custom crash handler** stores crash logs locally and only shares them when you explicitly tap Share.
-- **Open source.** Every line of code is auditable. If you find a vulnerability, see [SECURITY.md](SECURITY.md) for responsible disclosure.
-- The full privacy policy is in [`PRIVACY`](PRIVACY).
+- **No analytics, no crash reporting to a server, no ads, no tracking.** The crash reporter captures logcat and lets you share it manually — nothing is uploaded automatically.
+- **Privacy Vault** stores files in app-private storage (`context.filesDir`). Other apps (including the gallery) cannot read these files. Uninstalling SHS Player permanently deletes them — **back up before uninstalling**.
+- **Wi-Fi file transfer** binds to the local Wi-Fi interface only. The 16-character UUID auth token prevents unauthorized access. No cloud relay.
+- **INTERNET permission** is used only for: IPTV stream fetching, OpenSubtitles API, and yt-dlp binary auto-update from GitHub. None of these transmit user data or device identifiers.
+- **Location permission** is used only to read the Wi-Fi SSID/BSSID for the QR share code. The value is encoded into a QR bitmap shown on-screen; it is never stored or transmitted off the device.
+- **Application ID** `dev.anilbeesetti.nextplayer` is retained from upstream for Play Store continuity — it does not imply any affiliation with the upstream author.
 
 ---
 
 ## 🌍 Internationalization
 
-SHS Player is localised into **40+ languages** thanks to the upstream Next Player community and additional South-Asian language focus:
+SHS Player is localised into **40+ languages** via Android string resources (`res/values-*/strings.xml`). Supported locales include but are not limited to: `bn` (Bengali), `zh-rCN`, `zh-rTW`, `de`, `es`, `fr`, `hi`, `id`, `it`, `ja`, `ko`, `nl`, `pl`, `pt-rBR`, `pt-rPT`, `ro`, `ru`, `sv`, `tr`, `uk`, `vi`, and many more.
 
-`ar` · `bg` · `bn` · `ca` · `cs` · `da` · `de` · `el` · `es` · `et` · `fa` · `fi` · `fr` · `hi` · `hu` · `ia` · `in` · `it` · `iw` · `ja` · `kn` · `ko` · `ml` · `nb-rNO` · `nl` · `pa` · `pl` · `pt` · `pt-rBR` · `ro` · `ru` · `sv` · `ta` · `th` · `tr` · `uk` · `ur` · `vi` · `zh-rCN` · `zh-rTW` (+ English default).
-
-Particular emphasis on South-Asian scripts: **Bengali** (`bn`), **Hindi** (`hi`), **Punjabi** (`pa`), **Urdu** (`ur`), **Tamil** (`ta`), **Kannada** (`kn`), **Malayalam** (`ml`), **Persian** (`fa`), **Arabic** (`ar`).
-
-**Want to add or improve a translation?** Open a PR with updated `strings.xml` in the relevant `values-*` folder under `core/ui/src/main/res/`. Weblate / Crowdin integration is on the roadmap.
+To add or improve a translation:
+1. Copy `app/src/main/res/values/strings.xml` to `values-<locale>/strings.xml`.
+2. Translate all `<string>` values.
+3. Open a PR with just the translation file — no code changes needed.
 
 ---
 
@@ -891,7 +738,7 @@ This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.
 
 See [`SECURITY.md`](SECURITY.md). Summary:
 
-- **Supported versions:** the latest `0.15.x` release only.
+- **Supported versions:** the latest `0.17.x` release only.
 - **Reporting a vulnerability:** email **thejddev.official@gmail.com** privately. Do not open a public issue.
 - **Backup contact:** Telegram **@aamoviesadmin**.
 - Please allow up to 72 hours for an initial response and 90 days before public disclosure.
@@ -933,8 +780,8 @@ SHS Player is a fork of [Next Player](https://github.com/anilbeesetti/nextplayer
 ## 🙏 Credits & Acknowledgements
 
 - **Anil Kumar Beesetti** — original author of [Next Player](https://github.com/anilbeesetti/nextplayer), without which SHS Player would not exist.
-- **The AndroidX Media3 team** — for the ExoPlayer-based playback stack.
-- **The VideoLAN team** — for LibVLC, the second engine that handles the long tail of codecs.
+- **The VideoLAN team** — for LibVLC, the primary engine that handles the full range of codecs and streaming protocols.
+- **The AndroidX Media3 team** — for the ExoPlayer-based fallback playback stack.
 - **The Jetpack Compose team** — for the modern UI toolkit that makes Compose-first apps possible.
 - **Google MLKit** — for on-device barcode scanning.
 - **The ZXing project** — for QR code generation.
@@ -995,8 +842,8 @@ Join the conversation and connect with the developer and other users:
 **Q: Is SHS Player really free?**  
 A: Yes — free as in beer (no cost, no ads, no in-app purchases) and free as in speech (MIT-licensed open source).
 
-**Q: Why two engines (ExoPlayer + VLC)?**  
-A: ExoPlayer is fast and well-integrated with Android's media pipeline, but it can't play every codec/container. VLC fills the gaps — especially for niche codecs, broken files, and certain stream protocols. SHS Player picks the right engine per file (or you can force it in Decoder settings).
+**Q: Why two engines (LibVLC primary + ExoPlayer fallback)?**  
+A: LibVLC handles virtually every container, codec, and streaming protocol — including niche formats, broken files, UDP multicast, and RTSP streams that ExoPlayer struggles with. As of v0.17.0, all video intents go to `VlcPlayerActivity` (LibVLC). ExoPlayer (`PlayerActivity`) remains available as a fallback for edge cases and explicit decoder-priority testing via Settings → Decoder.
 
 **Q: Where are my Privacy Vault files stored?**  
 A: In app-private storage at `context.filesDir/vault/{videos,music}/`. They are invisible to other apps and to the gallery, and they are deleted if you uninstall SHS Player. **Back them up before uninstalling!**
@@ -1022,6 +869,9 @@ A: Not automatically. SHS Player uses the same DataStore file names but with ext
 **Q: Is there a dark theme?**  
 A: Three, actually: System (follows your device), On (always dark, with optional high-contrast / pure-black OLED mode), and Off (always light). Plus Material You dynamic theming on Android 12+.
 
+**Q: The audio delay slider went wild in older versions — is it fixed?**  
+A: Yes. v0.17.0 fixes bug #3 (double milliseconds→microseconds conversion) and bug #2 (garbled audio in `DelayAudioProcessor`). Audio delay now works precisely in both VLC (microsecond precision) and ExoPlayer paths.
+
 ---
 
 ## 🗺 Roadmap
@@ -1039,16 +889,8 @@ A: Three, actually: System (follows your device), On (always dark, with optional
 - Wear OS companion.
 
 **Recently shipped:**
-- Dual-engine (ExoPlayer + VLC) architecture.
-- Privacy Vault with biometric unlock.
-- Wi-Fi file transfer with QR auth.
-- IPTV / M3U browser with 8 free playlists.
-- Voice changer, AB-repeat, sleep timer, bookmarks, favourites.
-- Video trim, video→audio, reverse play, screenshot, mirror.
-- Online subtitle search (OpenSubtitles).
-- Premium Cupertino + Material 3 hybrid theme.
-- Custom crash reporter with logcat capture.
-- 40+ language translations.
+- **v0.17.0** — LibVLC promoted to primary default engine; `VlcPlayerActivity` full Compose UI (gestures, overlay, PiP, audio delay dialog, background service); 5 critical bug fixes (SeekParameters, DelayAudioProcessor, AudioDelayState, VlcEngine null guard, media memory leak).
+- **v0.16.0** — Dual-engine (ExoPlayer + VLC) architecture; Privacy Vault with biometric unlock; Wi-Fi file transfer with QR auth; IPTV / M3U browser with 8+ free playlists; Voice changer, AB-repeat, sleep timer, bookmarks, favourites; Video trim, video→audio, reverse play, screenshot, mirror; Online subtitle search (OpenSubtitles); Premium Cupertino + Material 3 hybrid theme; Custom crash reporter with logcat capture; 40+ language translations.
 
 ---
 
