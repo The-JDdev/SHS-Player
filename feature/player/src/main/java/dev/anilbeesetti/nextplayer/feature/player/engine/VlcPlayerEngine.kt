@@ -210,6 +210,8 @@ class VlcPlayerEngine(private val context: Context) {
      * Seek to position in milliseconds.
      * LibVLC's seeking is sample-accurate across all containers — no keyframe snapping.
      */
+    fun getCurrentPosition(): Long = mediaPlayer?.time ?: 0L
+
     fun seekTo(positionMs: Long) {
         try {
             mediaPlayer?.time = positionMs.coerceAtLeast(0)

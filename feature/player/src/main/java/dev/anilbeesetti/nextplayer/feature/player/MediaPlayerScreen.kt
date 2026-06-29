@@ -221,11 +221,13 @@ fun MediaPlayerScreen(
     }
 
     LaunchedEffect(abPointA, abPointB) {
-        if (abPointA != null && abPointB != null) {
+        val pointA = abPointA
+        val pointB = abPointB
+        if (pointA != null && pointB != null) {
             while (true) {
                 kotlinx.coroutines.delay(200)
-                if (player.currentPosition >= abPointB!!) {
-                    player.seekTo(abPointA!!)
+                if (player.currentPosition >= pointB) {
+                    player.seekTo(pointA)
                 }
             }
         }

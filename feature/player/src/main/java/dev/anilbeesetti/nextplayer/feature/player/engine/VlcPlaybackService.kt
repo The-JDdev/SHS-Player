@@ -74,6 +74,21 @@ class VlcPlaybackService : Service(), VlcPlayerEngine.EventListener {
     private var currentTitle: String = "SHS Player"
     private var currentUri: String? = null
 
+    /** Playlist for next/prev support: list of (uri, title) pairs. */
+    private val playlist = mutableListOf<Pair<String, String>>()
+    private var currentTrackIndex: Int = 0
+
+    private fun playTrack(index: Int) {
+        val (uri, title) = playlist[index]
+        currentTrackIndex = index
+        currentUri = uri
+        currentTitle = title
+        engine?.setDataSource(android.net.Uri.parse(uri))
+        engine?.play()
+        updateMediaSessionMetadata(title, uri)
+        updatePlaybackState(PlaybackStateCompat.STATE_PLAYING)
+    }
+
     override fun onCreate() {
         super.onCreate()
         instance = this
@@ -93,6 +108,12 @@ class VlcPlaybackService : Service(), VlcPlayerEngine.EventListener {
                 val title = intent.getStringExtra(EXTRA_TITLE) ?: "Unknown"
                 currentUri = uri
                 currentTitle = title
+                // Seed the playlist with the current track so next/prev don't crash
+                if (playlist.isEmpty() || playlist[currentTrackIndex].first != uri) {
+                    playlist.clear()
+                    playlist.add(uri to title)
+                    currentTrackIndex = 0
+                }
                 startForeground(NOTIFICATION_ID, buildNotification())
                 engine?.setDataSource(android.net.Uri.parse(uri))
                 engine?.play()
@@ -106,8 +127,19 @@ class VlcPlaybackService : Service(), VlcPlayerEngine.EventListener {
                 engine?.pause()
                 updatePlaybackState(PlaybackStateCompat.STATE_PAUSED)
             }
-            ACTION_NEXT -> { /* TODO: playlist support */ }
-            ACTION_PREV -> { /* TODO: playlist support */ }
+            ACTION_NEXT -> {
+                val nextIndex = (currentTrackIndex + 1).coerceAtMost(playlist.size - 1)
+                if (nextIndex != currentTrackIndex) playTrack(nextIndex)
+            }
+            ACTION_PREV -> {
+                val engine = engine
+                if (engine != null && engine.getCurrentPosition() > 3000L) {
+                    engine.seekTo(0L)
+                } else {
+                    val prevIndex = (currentTrackIndex - 1).coerceAtLeast(0)
+                    if (prevIndex != currentTrackIndex) playTrack(prevIndex)
+                }
+            }
             ACTION_STOP -> {
                 engine?.stop()
                 stopForeground(STOP_FOREGROUND_REMOVE)

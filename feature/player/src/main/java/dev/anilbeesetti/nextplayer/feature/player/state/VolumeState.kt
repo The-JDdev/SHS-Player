@@ -85,7 +85,8 @@ class VolumeState(
     private val volumeBoostEnabled: Boolean = false,
     private val initialVolume: Int? = null,
 ) {
-    private val audioManager = getSystemService(context, AudioManager::class.java)!!
+    private val audioManager = getSystemService(context, AudioManager::class.java)
+        ?: error("AudioManager unavailable — cannot initialise VolumeState")
 
     private val systemMaxVolume: Int = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
 

@@ -220,7 +220,7 @@ fun getMusicPrefs(context: Context): SharedPreferences =
     context.getSharedPreferences("music_prefs", Context.MODE_PRIVATE)
 
 fun getMusicFavorites(context: Context): Set<Long> =
-    getMusicPrefs(context).getStringSet("favorites", emptySet())!!.mapNotNull { it.toLongOrNull() }.toSet()
+    (getMusicPrefs(context).getStringSet("favorites", emptySet()) ?: emptySet()).mapNotNull { it.toLongOrNull() }.toSet()
 
 fun toggleMusicFavorite(context: Context, id: Long): Boolean {
     val prefs = getMusicPrefs(context)
@@ -245,7 +245,7 @@ fun removeBatchMusicFavorites(context: Context, ids: Set<Long>) {
 }
 
 fun getRecentMusicIds(context: Context): List<Long> =
-    getMusicPrefs(context).getString("recent", "")!!
+    (getMusicPrefs(context).getString("recent", "") ?: "")
         .split(",").mapNotNull { it.toLongOrNull() }
 
 fun addRecentMusic(context: Context, id: Long) {
@@ -256,13 +256,13 @@ fun addRecentMusic(context: Context, id: Long) {
 }
 
 fun getCustomPlaylists(context: Context): List<String> =
-    getMusicPrefs(context).getStringSet("playlists", emptySet())!!.sorted()
+    (getMusicPrefs(context).getStringSet("playlists", emptySet()) ?: emptySet()).sorted()
 
 fun saveCustomPlaylists(context: Context, playlists: List<String>) =
     getMusicPrefs(context).edit().putStringSet("playlists", playlists.toSet()).apply()
 
 fun getPlaylistSongs(context: Context, playlistName: String, allSongs: List<MusicItem>): List<MusicItem> {
-    val ids = getMusicPrefs(context).getStringSet("playlist_$playlistName", emptySet())!!
+    val ids = (getMusicPrefs(context).getStringSet("playlist_$playlistName", emptySet()) ?: emptySet())
         .mapNotNull { it.toLongOrNull() }.toSet()
     return allSongs.filter { it.id in ids }
 }
@@ -270,7 +270,7 @@ fun getPlaylistSongs(context: Context, playlistName: String, allSongs: List<Musi
 fun addSongToPlaylist(context: Context, playlistName: String, id: Long) {
     val prefs = getMusicPrefs(context)
     val key = "playlist_$playlistName"
-    val current = prefs.getStringSet(key, emptySet())!!.toMutableSet()
+    val current = (prefs.getStringSet(key, emptySet()) ?: emptySet()).toMutableSet()
     current.add(id.toString())
     prefs.edit().putStringSet(key, current).apply()
 }
@@ -278,7 +278,7 @@ fun addSongToPlaylist(context: Context, playlistName: String, id: Long) {
 fun addBatchSongsToPlaylist(context: Context, playlistName: String, ids: Set<Long>) {
     val prefs = getMusicPrefs(context)
     val key = "playlist_$playlistName"
-    val current = prefs.getStringSet(key, emptySet())!!.toMutableSet()
+    val current = (prefs.getStringSet(key, emptySet()) ?: emptySet()).toMutableSet()
     ids.forEach { current.add(it.toString()) }
     prefs.edit().putStringSet(key, current).apply()
 }

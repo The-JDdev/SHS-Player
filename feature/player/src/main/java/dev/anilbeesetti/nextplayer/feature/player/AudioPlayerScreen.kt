@@ -136,7 +136,9 @@ fun AudioVisualizerView(
                 }, Visualizer.getMaxCaptureRate() / 2, true, false)
                 viz.enabled = true
                 visualizer = viz
-            } catch (_: Exception) { }
+            } catch (e: Exception) {
+                android.util.Log.w("AudioVisualizer", "Visualizer init failed (sessionId=$sessionId): ${e.message}")
+            }
         }
     }
 
