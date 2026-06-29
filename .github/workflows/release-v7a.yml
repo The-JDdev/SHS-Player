@@ -1,0 +1,78 @@
+name: Build & Release v7a APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v0.17.0)'
+        required: false
+        default: 'v0.17.0'
+
+jobs:
+  build-v7a:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+
+      - name: Setup Android SDK
+        run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build armeabi-v7a Signed Release APK
+        run: |
+          ./gradlew assembleReleaseWithDebugSigning \
+            -Pandroid.abi.filter=armeabi-v7a \
+            --no-daemon
+        env:
+          GRADLE_OPTS: "-Xmx2g -Dfile.encoding=UTF-8"
+
+      - name: Find and rename APK
+        run: |
+          mkdir -p release_out
+          APK=$(find app/build/outputs/apk -name "*.apk" | head -1)
+          echo "Found: $APK"
+          cp "$APK" "release_out/shs-player-${{ github.event.inputs.tag }}-armeabi-v7a.apk"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: shs-player-v7a-apk
+          path: release_out/*.apk
+          retention-days: 30
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          name: "SHS Player ${{ github.event.inputs.tag }} (armeabi-v7a)"
+          body: |
+            ## SHS Player ${{ github.event.inputs.tag }}
+
+            ### What's New
+            - VLC engine integration for better codec support
+            - Audio queue bug fix  
+            - Video expand/collapse button
+            - TV section with 14 country categories (BD, IN, PK, US, GB, TR, etc.)
+            - PIP mode fix for 32-bit devices
+            - Draw over apps permission support
+            - WiFi auto-enable for file transfer
+
+            ### Download
+            Install the APK below — built for **armeabi-v7a** (32-bit ARM devices).
+          files: release_out/*.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
